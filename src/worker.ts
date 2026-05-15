@@ -78,7 +78,7 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
   const to = env.BUG_REPORT_TO || "willaugustine64@outlook.com";
   const emailPayload = {
     from: env.BUG_REPORT_FROM,
-    to,
+    to: [to],
     subject: `Website bug report: ${labelFromBugType(bugType)}`,
     text: [
       "A new website bug report was submitted.",
@@ -91,6 +91,13 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
       "More information:",
       sanitizePlainText(moreInfo),
     ].join("\n"),
+    html: bugReportHtml({
+      submittedAt,
+      pages,
+      bugType,
+      email,
+      moreInfo,
+    }),
     ...(email ? { replyTo: email } : {}),
     ...(attachments.length > 0 ? { attachments } : {}),
   };
@@ -114,6 +121,8 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
       toConfigured: Boolean(to),
       attachmentCount: attachments.length,
       payloadKeys: Object.keys(emailPayload),
+      resendRequestId: emailResponse.headers.get("x-request-id"),
+      resendContentType: emailResponse.headers.get("content-type"),
     });
 
     return jsonResponse({ message: "Bug report email could not be sent. Please try again later." }, 502);
@@ -208,6 +217,50 @@ function sanitizePlainText(value: string): string {
 
 function sanitizeFileName(value: string): string {
   return value.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120) || "bug-report-media";
+}
+
+function bugReportHtml(input: {
+  submittedAt: string;
+  pages: string[];
+  bugType: string;
+  email: string;
+  moreInfo: string;
+}): string {
+  const rows = [
+    ["Submitted", input.submittedAt],
+    ["Affected pages", input.pages.join(", ")],
+    ["Bug type", labelFromBugType(input.bugType)],
+    ["Follow up email", input.email || "Not provided"],
+  ];
+
+  return `
+    <h1>Website bug report</h1>
+    <table>
+      <tbody>
+        ${rows
+          .map(
+            ([label, value]) => `
+              <tr>
+                <th align="left" style="padding: 4px 12px 4px 0;">${escapeHtml(label)}</th>
+                <td style="padding: 4px 0;">${escapeHtml(value)}</td>
+              </tr>
+            `,
+          )
+          .join("")}
+      </tbody>
+    </table>
+    <h2>More information</h2>
+    <p style="white-space: pre-wrap;">${escapeHtml(sanitizePlainText(input.moreInfo))}</p>
+  `;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function labelFromBugType(value: string): string {
