@@ -1,110 +1,113 @@
-import { workItemTemplate } from "../components/cards";
 import { footerTemplate, navTemplate } from "../components/layout";
-import { navItems } from "../data/navigation";
-import { technologies } from "../data/profile";
-import { workItems } from "../data/workItems";
+import { travelPlaces, type TravelPlace } from "../data/travel";
+
+const favoriteMovies = [
+  { title: "Chef", poster: "/MoviePoster-Chef.jpg" },
+  { title: "The Batman", poster: "/MoviePoster-TheBatman.jpg" },
+  { title: "When Harry Met Sally", poster: "/MoviePoster-WhenHarryMetSally.jpg" },
+];
 
 export function renderAbout(): string {
   return `
     ${navTemplate("/")}
-    <main>
-      <section class="hero">
-        <div class="hero-media" aria-hidden="true"></div>
-        <div class="hero-overlay" aria-hidden="true"></div>
-        <div class="hero-content">
-          <p class="eyebrow">Microsoft engineer | React | TypeScript | Azure</p>
-          <h1>Building reliable web experiences for production teams.</h1>
-          <p class="hero-copy">
-            I am a software engineer with Microsoft experience building and supporting customer-facing web applications, with a focus on usability, reliability, automated testing, and Agile delivery.
+    <main class="about-page">
+      <section class="about-hero">
+        <div class="about-hero-copy">
+          <p class="eyebrow">Microsoft Engineer | Super cool dude</p>
+          <h1>Hi, I am Will Augustine.</h1>
+          <p>
+            I like building useful web things, solving messy problems, and working with people who care about making software better. When I am not coding, I am probably planning a trip, watching a movie, or hanging out with Milo and Otis.
           </p>
           <div class="hero-actions">
-            <fluent-button appearance="accent" href="/projects" data-route>View Projects</fluent-button>
-            <fluent-button appearance="outline" href="/resume" data-route>Resume</fluent-button>
+            <a class="action-button primary" href="/resume" data-route>View Resume</a>
+            <a class="action-button secondary" href="mailto:willaugustine64@outlook.com">Email Me</a>
+            <a class="action-button secondary" href="/projects" data-route>Current Projects</a>
+            <a class="action-button secondary" href="/technologies" data-route>How I Made This Website</a>
           </div>
         </div>
+        <figure class="about-hero-photo">
+          <img src="/about-will-venice.jpg" alt="Will Augustine in Venice, Italy" />
+        </figure>
       </section>
 
-      <section class="intro-section">
-        <div class="section-heading">
-          <p class="eyebrow">Focus</p>
-          <h2>Practical engineering shaped by production work.</h2>
-        </div>
-        <div class="intro-grid">
-          <fluent-card class="focus-card">
-            <span class="card-kicker">Frontend</span>
-            <h3>React and TypeScript</h3>
-            <p>Customer-facing web features, front-end architecture, UI/UX tradeoffs, and maintainable component-driven delivery.</p>
-          </fluent-card>
-          <fluent-card class="focus-card">
-            <span class="card-kicker">Cloud</span>
-            <h3>Azure and service reliability</h3>
-            <p>Azure capacity service experience, cloud service testing, incident coordination, on-call support, and regression-risk reduction.</p>
-          </fluent-card>
-          <fluent-card class="focus-card">
-            <span class="card-kicker">Delivery</span>
-            <h3>Agile and CI/CD</h3>
-            <p>User stories, estimates, code reviews, cross-functional collaboration, Azure DevOps, and release discipline.</p>
-          </fluent-card>
-        </div>
-      </section>
-
-      <section class="tech-section">
-        <div class="section-heading">
-          <p class="eyebrow">Technology Map</p>
-          <h2>The tools and practices I use most often.</h2>
-        </div>
-        <div class="tech-list">
-          ${technologies.map((tech) => `<fluent-badge appearance="filled">${tech}</fluent-badge>`).join("")}
-        </div>
-      </section>
-
-      <section class="sprint-section">
-        <div class="section-heading">
-          <p class="eyebrow">Sprint Planning</p>
-          <h2>Public roadmap, private editing.</h2>
+      <section class="travel-section">
+        <div class="travel-copy">
+          <p class="eyebrow">Travel</p>
+          <h2>I love seeing new places.</h2>
           <p>
-            Visitors should be able to view portfolio work items, while create, edit, and update actions should live behind an authenticated admin experience backed by an API.
+            Travel is one of the ways I reset and stay curious. I grew up in Washington, went to college in Montana, now live in Philadelphia, and I keep adding new places to the map.
           </p>
         </div>
-        <div class="sprint-layout">
-          <div class="work-items">
-            ${workItems.map(workItemTemplate).join("")}
+        <div class="flat-map">
+          <div class="map-canvas" aria-label="Map of places Will has lived or visited">
+            <img class="world-outline-map" src="/world-outline.svg" alt="World map outline" />
+            ${travelPlaces.map(travelPinTemplate).join("")}
           </div>
-          <aside class="decision-panel">
-            <h3>Recommended editing model</h3>
-            <p>
-              Keep this board read-only for visitors. Add a login-protected admin page later so you can manage work items in the frontend, with the backend enforcing permissions and persisting the data.
-            </p>
-            <fluent-divider></fluent-divider>
-            <ul>
-              <li>Public users: view roadmap and status.</li>
-              <li>You: create, update, reorder, and close items after login.</li>
-              <li>Backend: own validation, authorization, audit fields, and storage.</li>
-            </ul>
-          </aside>
         </div>
       </section>
 
-      <section class="next-pages">
+      <section class="about-personal-section">
         <div class="section-heading">
-          <p class="eyebrow">Next Pages</p>
-          <h2>Short routes are ready for the rest of the site.</h2>
+          <p class="eyebrow">Outside The Code</p>
+          <h2>A little more about me.</h2>
         </div>
-        <div class="page-link-grid">
-          ${navItems
-            .filter((item) => item.path !== "/")
-            .map(
-              (item) => `
-                <a class="page-link" href="${item.path}" data-route>
-                  <span>${item.label}</span>
-                  <small>${item.path}</small>
-                </a>
-              `,
-            )
-            .join("")}
+        <div class="personal-grid">
+          <article class="personal-story dogs-story">
+            <figure class="personal-photo">
+              <img src="/about-milo-otis.jpg" alt="Will Augustine with Amelia and their dogs Milo and Otis" loading="lazy" />
+            </figure>
+            <div class="personal-copy">
+              <p class="eyebrow">My Family</p>
+              <h3>The best part of every day.</h3>
+              <p>
+                Milo and Otis are a huge part of my life. Milo is a golden retriever with endless joy, and Otis is a border collie mix with a big personality and even bigger opinions. They make every day better, funnier, and a lot more lively. My amazing wife Amelia loves exploring the world with me and is the best travel buddy I could ask for. We are always planning our next trip or adventure together.
+              </p>
+              <div class="dog-facts" aria-label="Dog details">
+                <span><strong>Milo</strong> Golden retriever</span>
+                <span><strong>Otis</strong> Border collie mix</span>
+                <span><strong>Amelia</strong> The best</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="personal-story movie-story">
+            <div class="personal-copy">
+              <p class="eyebrow">Movies</p>
+              <h3>I love movies and keeping track of what I watch.</h3>
+              <p>
+                Movies are one of my favorite ways to unwind and find new stories to think about. I have aLetterboxd account for logging watches, ratings, and giving some first thoughts after finishing a movie.
+              </p>
+              <a class="action-button secondary" href="https://letterboxd.com/FoodieFrank/" target="_blank" rel="noreferrer">View My Letterboxd Profile</a>
+            </div>
+            <div class="movie-poster-grid" aria-label="Favorite movies">
+              ${favoriteMovies.map(favoriteMovieTemplate).join("")}
+            </div>
+          </article>
         </div>
       </section>
+
     </main>
     ${footerTemplate()}
+  `;
+}
+
+function travelPinTemplate(place: TravelPlace): string {
+  const tooltip = place.note ? `<strong>${place.label}</strong><span>${place.note}</span>` : `<strong>${place.label}</strong>`;
+  const ariaLabel = place.note ? `${place.label}: ${place.note}` : place.label;
+
+  return `
+    <button class="travel-pin" type="button" style="left: ${place.x}%; top: ${place.y}%;" aria-label="${ariaLabel}">
+      <span class="pin-dot"></span>
+      <span class="pin-tooltip">${tooltip}</span>
+    </button>
+  `;
+}
+
+function favoriteMovieTemplate(movie: { title: string; poster: string }): string {
+  return `
+    <figure class="movie-poster-card">
+      <img src="${movie.poster}" alt="${movie.title} movie poster" loading="lazy" />
+      <figcaption>${movie.title}</figcaption>
+    </figure>
   `;
 }

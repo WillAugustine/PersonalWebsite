@@ -139,7 +139,7 @@ a {
 .card-kicker {
   margin: 0 0 12px;
   color: var(--green-700);
-  font-size: 0.78rem;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -255,6 +255,280 @@ main > section:not(.hero) {
 .next-pages,
 .simple-page {
   background: var(--surface-soft);
+}
+
+.about-page {
+  background: #ffffff;
+}
+
+.about-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 390px);
+  gap: clamp(28px, 6vw, 80px);
+  align-items: center;
+  min-height: clamp(520px, 76svh, 700px);
+  padding: clamp(56px, 9vw, 110px) clamp(18px, 5vw, 72px) clamp(44px, 6vw, 72px);
+  background:
+    linear-gradient(120deg, rgba(244, 251, 247, 0.95), rgba(255, 255, 255, 0.72)),
+    radial-gradient(circle at 82% 24%, rgba(52, 164, 125, 0.16), transparent 28%);
+}
+
+.about-hero-copy h1 {
+  max-width: 24ch;
+}
+
+.about-hero-copy p:not(.eyebrow) {
+  max-width: 740px;
+  font-size: clamp(1.08rem, 2vw, 1.32rem);
+}
+
+.about-hero-photo {
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(31, 107, 82, 0.18);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.about-hero-photo img {
+  display: block;
+  width: 100%;
+  height: clamp(390px, 50vw, 560px);
+  object-fit: cover;
+  object-position: center 36%;
+}
+
+.travel-section {
+  display: grid;
+  grid-template-columns: minmax(260px, 430px) minmax(0, 1fr);
+  gap: clamp(28px, 6vw, 80px);
+  align-items: center;
+  padding: clamp(54px, 8vw, 96px) clamp(18px, 5vw, 72px);
+  background: var(--green-050);
+}
+
+.travel-copy p:not(.eyebrow) {
+  font-size: 1.08rem;
+}
+
+.flat-map {
+  position: relative;
+  display: grid;
+  align-items: center;
+  min-height: 0;
+  padding: clamp(14px, 2vw, 22px);
+  border: 1px solid rgba(31, 107, 82, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(31, 107, 82, 0.06) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(31, 107, 82, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, #ffffff, #f7fbf8);
+  background-size: 42px 42px;
+  box-shadow: var(--shadow);
+}
+
+.map-canvas {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1000 / 540;
+}
+
+.world-outline-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.travel-pin {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  background: transparent;
+  color: var(--green-900);
+  cursor: pointer;
+  font: inherit;
+  transform: translate(-7px, -50%);
+}
+
+.travel-pin:hover,
+.travel-pin:focus-visible {
+  z-index: 20;
+}
+
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  background: var(--green-700);
+  box-shadow: 0 4px 12px rgba(18, 56, 43, 0.28);
+}
+
+.pin-tooltip {
+  position: absolute;
+  z-index: 21;
+  left: 0;
+  bottom: calc(100% + 8px);
+  display: grid;
+  gap: 2px;
+  min-width: 130px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #ffffff;
+  background: var(--green-900);
+  font-size: 0.82rem;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+
+.pin-tooltip strong,
+.pin-tooltip span {
+  display: block;
+}
+
+.pin-tooltip span {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.76rem;
+}
+
+.travel-pin:hover .pin-tooltip,
+.travel-pin:focus-visible .pin-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.travel-pin:focus-visible {
+  outline: 3px solid rgba(52, 164, 125, 0.28);
+  border-radius: 999px;
+}
+
+.about-personal-section {
+  padding: clamp(54px, 8vw, 96px) clamp(18px, 5vw, 72px);
+  background: #ffffff;
+}
+
+.personal-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.personal-story {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(22px, 4vw, 44px);
+  align-items: center;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.movie-story {
+  grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1.18fr);
+  background: var(--green-050);
+}
+
+.personal-photo {
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--green-100);
+}
+
+.personal-photo img {
+  display: block;
+  width: 100%;
+  height: clamp(320px, 44vw, 520px);
+  object-fit: cover;
+}
+
+.dogs-story .personal-photo img {
+  height: clamp(520px, 76vw, 860px);
+  object-fit: contain;
+}
+
+.personal-copy {
+  display: grid;
+  gap: 14px;
+  align-content: center;
+}
+
+.personal-copy h3 {
+  margin: 0;
+  color: var(--green-900);
+  font-size: clamp(1.65rem, 3vw, 2.35rem);
+  line-height: 1.05;
+}
+
+.personal-copy p:not(.eyebrow) {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.dog-facts {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.dog-facts span {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid rgba(31, 107, 82, 0.18);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--green-900);
+  font-size: 0.92rem;
+}
+
+.movie-poster-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 2vw, 18px);
+  align-items: start;
+}
+
+.movie-poster-card {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+}
+
+.movie-poster-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border: 1px solid rgba(31, 107, 82, 0.18);
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 16px 34px rgba(18, 56, 43, 0.14);
+}
+
+.movie-poster-card figcaption {
+  color: var(--green-900);
+  font-size: clamp(0.82rem, 1.4vw, 0.98rem);
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .section-heading {
@@ -853,6 +1127,10 @@ fluent-badge {
   }
 
   .intro-grid,
+  .about-hero,
+  .travel-section,
+  .personal-story,
+  .movie-story,
   .sprint-layout,
   .page-link-grid,
   .resume-hero,
@@ -904,6 +1182,14 @@ fluent-badge {
 
   .hero-content {
     padding-top: 52px;
+  }
+
+  .movie-poster-grid {
+    gap: 10px;
+  }
+
+  .movie-poster-card figcaption {
+    font-size: 0.78rem;
   }
 
   .decision-panel,
