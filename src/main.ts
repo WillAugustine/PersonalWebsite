@@ -9,9 +9,10 @@ import {
 import { navItems } from "./data/navigation";
 import { pageSummaries } from "./data/pages";
 import { renderExperience } from "./pages/experience";
-import { renderHome } from "./pages/home";
+import { renderAbout } from "./pages/about";
 import { renderPlaceholder } from "./pages/placeholder";
 import { renderResume } from "./pages/resume";
+import { renderTechnologies } from "./pages/technologies";
 import type { AppPath } from "./types";
 import "./styles.css";
 
@@ -40,11 +41,13 @@ function route(): void {
   const path = getCurrentPath();
 
   if (path === "/") {
-    app.innerHTML = renderHome();
+    app.innerHTML = renderAbout();
   } else if (path === "/resume") {
     app.innerHTML = renderResume();
   } else if (path === "/experience") {
     app.innerHTML = renderExperience();
+  } else if (path === "/technologies") {
+    app.innerHTML = renderTechnologies();
   } else {
     app.innerHTML = renderPlaceholder(path, pageSummaries[path]);
   }

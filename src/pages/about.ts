@@ -4,7 +4,7 @@ import { navItems } from "../data/navigation";
 import { technologies } from "../data/profile";
 import { workItems } from "../data/workItems";
 
-export function renderHome(): string {
+export function renderAbout(): string {
   return `
     ${navTemplate("/")}
     <main>

@@ -39,3 +39,18 @@ export type SkillGroup = {
   label: string;
   skills: string[];
 };
+
+export type TechnologyTier = {
+  title: string;
+  summary: string;
+  technologies: string[];
+  details: string[];
+};
+
+export type ComponentBreakdown = {
+  name: string;
+  status: "Live" | "Planned" | "In progress";
+  purpose: string;
+  tools: string[];
+  notes: string[];
+};

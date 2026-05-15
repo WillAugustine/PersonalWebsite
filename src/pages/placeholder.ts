@@ -9,7 +9,7 @@ export function renderPlaceholder(path: AppPath, page: PageSummary): string {
         <p class="eyebrow">${page.eyebrow}</p>
         <h1>${page.title}</h1>
         <p>${page.body}</p>
-        <fluent-button appearance="accent" href="/" data-route>Back Home</fluent-button>
+        <fluent-button appearance="accent" href="/" data-route>Back to About</fluent-button>
       </section>
     </main>
     ${footerTemplate()}
