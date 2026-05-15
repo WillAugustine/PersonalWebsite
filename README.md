@@ -31,7 +31,7 @@ Build command: npm run build
 Deploy command: npx wrangler deploy
 Non-production branch deploy command: npx wrangler versions upload
 Root directory: /
-Node version: 20
+Node version: 22
 ```
 
 SPA fallback for short routes such as `/experience`, `/projects`, and `/resume` is configured in `wrangler.jsonc`:

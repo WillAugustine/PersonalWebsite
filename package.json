@@ -4,6 +4,9 @@
   "private": true,
   "description": "Personal portfolio website for william-augustine.com.",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "build": "tsc --noEmit && vite build",
     "dev": "vite --host 0.0.0.0",
