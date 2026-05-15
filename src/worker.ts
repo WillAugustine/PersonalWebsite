@@ -76,6 +76,24 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
   const attachments = await Promise.all(mediaFiles.map(fileToResendAttachment));
   const submittedAt = new Date().toISOString();
   const to = env.BUG_REPORT_TO || "willaugustine64@outlook.com";
+  const emailPayload = {
+    from: env.BUG_REPORT_FROM,
+    to,
+    subject: `Website bug report: ${labelFromBugType(bugType)}`,
+    text: [
+      "A new website bug report was submitted.",
+      "",
+      `Submitted: ${submittedAt}`,
+      `Affected pages: ${pages.join(", ")}`,
+      `Bug type: ${labelFromBugType(bugType)}`,
+      `Follow up email: ${email || "Not provided"}`,
+      "",
+      "More information:",
+      sanitizePlainText(moreInfo),
+    ].join("\n"),
+    ...(email ? { reply_to: email } : {}),
+    ...(attachments.length > 0 ? { attachments } : {}),
+  };
 
   const emailResponse = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -83,26 +101,20 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      from: env.BUG_REPORT_FROM,
-      to,
-      subject: `Website bug report: ${labelFromBugType(bugType)}`,
-      text: [
-        "A new website bug report was submitted.",
-        "",
-        `Submitted: ${submittedAt}`,
-        `Affected pages: ${pages.join(", ")}`,
-        `Bug type: ${labelFromBugType(bugType)}`,
-        `Follow up email: ${email || "Not provided"}`,
-        "",
-        "More information:",
-        sanitizePlainText(moreInfo),
-      ].join("\n"),
-      attachments,
-    }),
+    body: JSON.stringify(emailPayload),
   });
 
   if (!emailResponse.ok) {
+    const resendError = await safeReadResponseText(emailResponse);
+    console.error("Resend bug report email failed", {
+      status: emailResponse.status,
+      statusText: emailResponse.statusText,
+      body: resendError,
+      fromConfigured: Boolean(env.BUG_REPORT_FROM),
+      toConfigured: Boolean(to),
+      attachmentCount: attachments.length,
+    });
+
     return jsonResponse({ message: "Bug report email could not be sent. Please try again later." }, 502);
   }
 
@@ -202,6 +214,14 @@ function labelFromBugType(value: string): string {
     .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+async function safeReadResponseText(response: Response): Promise<string> {
+  try {
+    return (await response.text()).slice(0, 1000);
+  } catch {
+    return "Unable to read Resend error body.";
+  }
 }
 
 function jsonResponse(body: unknown, status = 200): Response {
