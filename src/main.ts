@@ -1,15 +1,12 @@
 import {
-  provideFluentDesignSystem,
   fluentAnchor,
   fluentBadge,
   fluentButton,
   fluentCard,
   fluentDivider,
-  fluentProgress,
-  fluentTab,
-  fluentTabPanel,
-  fluentTabs,
-} from "https://esm.sh/@fluentui/web-components@2.6.1";
+  provideFluentDesignSystem,
+} from "@fluentui/web-components";
+import "./styles.css";
 
 provideFluentDesignSystem().register(
   fluentAnchor(),
@@ -17,15 +14,47 @@ provideFluentDesignSystem().register(
   fluentButton(),
   fluentCard(),
   fluentDivider(),
-  fluentProgress(),
-  fluentTab(),
-  fluentTabPanel(),
-  fluentTabs(),
 );
 
-const app = document.querySelector("#app");
+type NavItem = {
+  label: string;
+  path: AppPath;
+};
 
-const navItems = [
+type AppPath =
+  | "/"
+  | "/experience"
+  | "/projects"
+  | "/technologies"
+  | "/sprint"
+  | "/chat"
+  | "/resume";
+
+type PageSummary = {
+  eyebrow: string;
+  title: string;
+  body: string;
+};
+
+type WorkItemStatus = "Ready" | "In progress" | "Backlog";
+
+type WorkItem = {
+  id: string;
+  status: WorkItemStatus;
+  title: string;
+  description: string;
+  estimate: string;
+};
+
+const appRoot = document.querySelector<HTMLDivElement>("#app");
+
+if (!appRoot) {
+  throw new Error("App root element was not found.");
+}
+
+const app = appRoot;
+
+const navItems: NavItem[] = [
   { label: "Home", path: "/" },
   { label: "Experience", path: "/experience" },
   { label: "Projects", path: "/projects" },
@@ -48,7 +77,7 @@ const technologies = [
   "Agile",
 ];
 
-const workItems = [
+const workItems: WorkItem[] = [
   {
     id: "WEB-101",
     status: "Ready",
@@ -72,7 +101,7 @@ const workItems = [
   },
 ];
 
-const pageSummaries = {
+const pageSummaries: Record<Exclude<AppPath, "/">, PageSummary> = {
   "/experience": {
     eyebrow: "Experience",
     title: "Work History",
@@ -105,18 +134,24 @@ const pageSummaries = {
   },
 };
 
-function route() {
-  const path = window.location.pathname;
+function getCurrentPath(): AppPath {
+  const path = window.location.pathname as AppPath;
+  return navItems.some((item) => item.path === path) ? path : "/projects";
+}
+
+function route(): void {
+  const path = getCurrentPath();
+
   if (path === "/") {
     renderLanding();
     return;
   }
 
-  renderPlaceholder(pageSummaries[path] || pageSummaries["/projects"]);
+  renderPlaceholder(pageSummaries[path]);
 }
 
-function navTemplate() {
-  const currentPath = window.location.pathname;
+function navTemplate(): string {
+  const currentPath = getCurrentPath();
 
   return `
     <header class="site-header">
@@ -139,12 +174,13 @@ function navTemplate() {
   `;
 }
 
-function renderLanding() {
+function renderLanding(): void {
   app.innerHTML = `
     ${navTemplate()}
     <main>
       <section class="hero">
-        <div class="hero-overlay"></div>
+        <div class="hero-media" aria-hidden="true"></div>
+        <div class="hero-overlay" aria-hidden="true"></div>
         <div class="hero-content">
           <p class="eyebrow">Full stack engineering | Cloud | Data | Delivery</p>
           <h1>Building dependable software from model to production.</h1>
@@ -202,21 +238,7 @@ function renderLanding() {
         </div>
         <div class="sprint-layout">
           <div class="work-items">
-            ${workItems
-              .map(
-                (item) => `
-                  <fluent-card class="work-card">
-                    <div class="work-card-topline">
-                      <span>${item.id}</span>
-                      <fluent-badge appearance="${item.status === "In progress" ? "accent" : "filled"}">${item.status}</fluent-badge>
-                    </div>
-                    <h3>${item.title}</h3>
-                    <p>${item.description}</p>
-                    <span class="estimate">${item.estimate}</span>
-                  </fluent-card>
-                `,
-              )
-              .join("")}
+            ${workItems.map(workItemTemplate).join("")}
           </div>
           <aside class="decision-panel">
             <h3>Recommended editing model</h3>
@@ -259,7 +281,23 @@ function renderLanding() {
   bindRoutes();
 }
 
-function renderPlaceholder(page) {
+function workItemTemplate(item: WorkItem): string {
+  const badgeAppearance = item.status === "In progress" ? "accent" : "filled";
+
+  return `
+    <fluent-card class="work-card">
+      <div class="work-card-topline">
+        <span>${item.id}</span>
+        <fluent-badge appearance="${badgeAppearance}">${item.status}</fluent-badge>
+      </div>
+      <h3>${item.title}</h3>
+      <p>${item.description}</p>
+      <span class="estimate">${item.estimate}</span>
+    </fluent-card>
+  `;
+}
+
+function renderPlaceholder(page: PageSummary): void {
   app.innerHTML = `
     ${navTemplate()}
     <main class="simple-page">
@@ -276,17 +314,17 @@ function renderPlaceholder(page) {
   bindRoutes();
 }
 
-function footerTemplate() {
+function footerTemplate(): string {
   return `
     <footer class="site-footer">
-      <span>Will A. Portfolio</span>
-      <span>Built with Fluent UI Web Components and clean route foundations.</span>
+      <span>Will Augustine's Portfolio</span>
+      <span>All information on this site is true and accurate.</span>
     </footer>
   `;
 }
 
-function bindRoutes() {
-  document.querySelectorAll("[data-route]").forEach((link) => {
+function bindRoutes(): void {
+  document.querySelectorAll<HTMLElement>("[data-route]").forEach((link) => {
     link.addEventListener("click", (event) => {
       const href = link.getAttribute("href");
       if (!href || href.startsWith("http")) {
