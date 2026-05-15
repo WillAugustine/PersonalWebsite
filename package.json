@@ -1,0 +1,9 @@
+{
+  "name": "personal-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal portfolio landing page with Fluent UI Web Components and clean short routes.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
