@@ -1,5 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
+import { Resend } from "resend";
+
 type Env = {
   ASSETS: Fetcher;
   RESEND_API_KEY?: string;
@@ -63,7 +65,9 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
     return jsonResponse({ message: validationError }, 400);
   }
 
-  if (!env.RESEND_API_KEY || !env.BUG_REPORT_FROM) {
+  const resendApiKey = normalizeResendApiKey(env.RESEND_API_KEY);
+
+  if (!resendApiKey || !env.BUG_REPORT_FROM) {
     return jsonResponse(
       {
         message:
@@ -113,34 +117,26 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
     ...(attachments.length > 0 ? { attachments } : {}),
   };
 
-  const emailResponse = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(emailPayload),
-  });
+  const resend = new Resend(resendApiKey);
+  const { data, error } = await resend.emails.send(emailPayload);
 
-  if (!emailResponse.ok) {
-    const resendError = await safeReadResponseText(emailResponse);
+  if (error) {
     console.error("Resend bug report email failed", {
-      status: emailResponse.status,
-      statusText: emailResponse.statusText,
-      body: resendError,
+      error,
+      apiKeyLooksValid: resendApiKey.startsWith("re_"),
+      apiKeyLength: resendApiKey.length,
       fromConfigured: Boolean(env.BUG_REPORT_FROM),
       toConfigured: Boolean(to),
       attachmentCount: attachments.length,
       payloadKeys: Object.keys(emailPayload),
-      resendRequestId: emailResponse.headers.get("x-request-id"),
-      resendContentType: emailResponse.headers.get("content-type"),
       from: diagnosticEmailValue(from),
       to: diagnosticEmailValue(to),
     });
 
     return jsonResponse({ message: "Bug report email could not be sent. Please try again later." }, 502);
   }
+
+  console.log("Bug report email sent", { id: data?.id, to: diagnosticEmailValue(to) });
 
   return jsonResponse({ message: "Bug report submitted. Thank you." });
 }
@@ -296,12 +292,8 @@ function labelFromBugType(value: string): string {
     .join(" ");
 }
 
-async function safeReadResponseText(response: Response): Promise<string> {
-  try {
-    return (await response.text()).slice(0, 1000);
-  } catch {
-    return "Unable to read Resend error body.";
-  }
+function normalizeResendApiKey(value: string | undefined): string {
+  return (value || "").trim().replace(/^Bearer\s+/i, "");
 }
 
 function jsonResponse(body: unknown, status = 200): Response {

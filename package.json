@@ -14,7 +14,8 @@
     "start": "vite --host 0.0.0.0"
   },
   "dependencies": {
-    "@fluentui/web-components": "^2.6.1"
+    "@fluentui/web-components": "^2.6.1",
+    "resend": "^6.12.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260515.0",
