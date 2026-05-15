@@ -6,8 +6,10 @@ import {
   fluentDivider,
   provideFluentDesignSystem,
 } from "@fluentui/web-components";
+import { bindBugReportForm } from "./bugReportForm";
 import { navItems } from "./data/navigation";
 import { pageSummaries } from "./data/pages";
+import { renderAgileWorkboard } from "./pages/agileWorkboard";
 import { renderExperience } from "./pages/experience";
 import { renderAbout } from "./pages/about";
 import { renderPlaceholder } from "./pages/placeholder";
@@ -48,11 +50,14 @@ function route(): void {
     app.innerHTML = renderExperience();
   } else if (path === "/technologies") {
     app.innerHTML = renderTechnologies();
+  } else if (path === "/sprint") {
+    app.innerHTML = renderAgileWorkboard();
   } else {
     app.innerHTML = renderPlaceholder(path, pageSummaries[path]);
   }
 
   bindRoutes();
+  bindBugReportForm();
 }
 
 function bindRoutes(): void {

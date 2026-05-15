@@ -28,6 +28,30 @@ export type WorkItem = {
   estimate: string;
 };
 
+export type AgileTaskStatus = "To do" | "In progress" | "Done";
+
+export type AgileTask = {
+  id: string;
+  title: string;
+  status: AgileTaskStatus;
+  owner: string;
+};
+
+export type UserStory = {
+  id: string;
+  title: string;
+  persona: string;
+  goal: string;
+  benefit: string;
+  acceptanceCriteria: string[];
+  tasks: AgileTask[];
+};
+
+export type BugType = {
+  label: string;
+  value: string;
+};
+
 export type ExperienceItem = {
   role: string;
   organization: string;

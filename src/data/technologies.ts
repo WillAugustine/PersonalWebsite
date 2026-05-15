@@ -71,11 +71,21 @@ export const componentBreakdowns: ComponentBreakdown[] = [
   {
     name: "Sprint Planning Board",
     status: "Live",
-    purpose: "Expose a public roadmap of work items while reserving editing for a future authenticated workflow.",
-    tools: ["Typed work-item data", "Fluent UI badges", "Static rendering", "Future Cloudflare Worker API"],
+    purpose: "Expose a public Agile workboard with user stories, acceptance criteria, tasks, and bug reporting.",
+    tools: ["Typed Agile data", "Fluent UI badges", "Static rendering", "Cloudflare Worker API"],
     notes: [
-      "The current board is read-only and source-controlled.",
+      "The current board is read-only and source-controlled, with the chatbot user story broken into implementation tasks.",
       "A future admin surface can add login, API validation, and persistent storage.",
+    ],
+  },
+  {
+    name: "Bug Reporting",
+    status: "Live",
+    purpose: "Collect visitor bug reports with affected pages, bug type, optional media, follow-up email, and plain-text details.",
+    tools: ["TypeScript form validation", "Cloudflare Worker API", "Multipart form data", "Resend email API", "Server-side validation"],
+    notes: [
+      "The browser validates required fields, file count, file type, and upload size before submission.",
+      "The Worker repeats validation server-side, strips unsafe angle brackets from plain text, rejects HTML-like input, and sends the report by email when Resend secrets are configured.",
     ],
   },
   {

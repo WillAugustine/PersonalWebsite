@@ -34,6 +34,26 @@ Root directory: /
 Node version: 22
 ```
 
+## Bug Report Email
+
+The Agile Workboard includes a bug-report form that posts to `/api/bug-report`. The Worker validates the submission, rejects unsafe text and oversized media, and sends the report through Resend.
+
+Configure these Cloudflare Worker values before expecting live emails:
+
+```txt
+RESEND_API_KEY    Secret. Create this in Resend and add it as a Cloudflare Worker secret.
+BUG_REPORT_FROM   Variable. A verified sender, such as bug-reports@william-augustine.com.
+BUG_REPORT_TO     Variable. Optional; defaults to willaugustine64@outlook.com.
+```
+
+Suggested setup:
+
+```powershell
+npx wrangler secret put RESEND_API_KEY
+```
+
+Then add `BUG_REPORT_FROM` and `BUG_REPORT_TO` in the Cloudflare Worker dashboard under settings for variables/secrets. The sender domain must be verified with Resend.
+
 SPA fallback for short routes such as `/experience`, `/projects`, and `/resume` is configured in `wrangler.jsonc`:
 
 ```jsonc

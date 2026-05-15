@@ -12,9 +12,9 @@ export const pageSummaries: Record<Exclude<AppPath, "/" | "/experience" | "/resu
     body: "A transparent build log covering TypeScript, Fluent UI, cloud hosting, CI/CD, data modeling, and future backend choices.",
   },
   "/sprint": {
-    eyebrow: "Sprint Planning",
-    title: "Portfolio Work Items",
-    body: "A public view of upcoming work, current priorities, and completed enhancements for the website.",
+    eyebrow: "Agile Workboard",
+    title: "User Stories, Tasks, and Bugs",
+    body: "A public workboard for planned portfolio improvements, implementation tasks, and bug reporting.",
   },
   "/chat": {
     eyebrow: "Chat",
