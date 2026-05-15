@@ -115,13 +115,6 @@ a {
   inset: 0;
 }
 
-.hero-media {
-  z-index: -2;
-  background:
-    url("/assets/hero-tech-workspace.png") center / cover no-repeat,
-    var(--green-050);
-}
-
 .hero-overlay {
   z-index: -1;
   background:

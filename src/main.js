@@ -144,7 +144,6 @@ function renderLanding() {
     ${navTemplate()}
     <main>
       <section class="hero">
-        <div class="hero-media" aria-hidden="true"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
           <p class="eyebrow">Full stack engineering | Cloud | Data | Delivery</p>
