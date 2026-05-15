@@ -14,8 +14,8 @@ export function renderResume(): string {
             Mid-level software engineer with Microsoft experience building and supporting production, customer-facing web applications.
           </p>
           <div class="resume-actions">
-            <fluent-button appearance="accent" href="/WillAugustine_Resume.pdf">Open PDF</fluent-button>
-            <fluent-button appearance="outline" href="mailto:willaugustine64@outlook.com">Email Me</fluent-button>
+            <a class="action-button primary" href="/WillAugustine_Resume.pdf" download>Download PDF Resume</a>
+            <a class="action-button secondary" href="mailto:willaugustine64@outlook.com">Email Me</a>
           </div>
         </div>
         <fluent-card class="contact-card">

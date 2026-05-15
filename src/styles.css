@@ -207,6 +207,37 @@ fluent-button[appearance="accent"] {
   --accent-foreground-rest: #ffffff;
 }
 
+.action-button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 14px 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  line-height: 1.3;
+}
+
+.action-button.primary {
+  color: #ffffff;
+  background: var(--green-700);
+}
+
+.action-button.primary:hover {
+  background: var(--green-800);
+}
+
+.action-button.secondary {
+  border-color: #c8d6ce;
+  color: var(--ink);
+  background: #ffffff;
+}
+
+.action-button.secondary:hover {
+  border-color: var(--green-600);
+  color: var(--green-800);
+}
+
 main > section:not(.hero) {
   padding: clamp(60px, 9vw, 108px) clamp(18px, 5vw, 72px);
 }
