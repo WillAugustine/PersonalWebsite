@@ -6,7 +6,7 @@ export function navTemplate(currentPath: AppPath): string {
     <header class="site-header">
       <a class="brand" href="/" data-route>
         <span class="brand-mark">WA</span>
-        <span>Will A.</span>
+        <span>Will Augustine</span>
       </a>
       <nav class="nav-links" aria-label="Main navigation">
         ${navItems
