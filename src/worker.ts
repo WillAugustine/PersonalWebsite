@@ -91,7 +91,7 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
       "More information:",
       sanitizePlainText(moreInfo),
     ].join("\n"),
-    ...(email ? { reply_to: email } : {}),
+    ...(email ? { replyTo: email } : {}),
     ...(attachments.length > 0 ? { attachments } : {}),
   };
 
@@ -113,6 +113,7 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
       fromConfigured: Boolean(env.BUG_REPORT_FROM),
       toConfigured: Boolean(to),
       attachmentCount: attachments.length,
+      payloadKeys: Object.keys(emailPayload),
     });
 
     return jsonResponse({ message: "Bug report email could not be sent. Please try again later." }, 502);
