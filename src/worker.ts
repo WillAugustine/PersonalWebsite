@@ -75,9 +75,20 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
 
   const attachments = await Promise.all(mediaFiles.map(fileToResendAttachment));
   const submittedAt = new Date().toISOString();
-  const to = env.BUG_REPORT_TO || "willaugustine64@outlook.com";
+  const from = env.BUG_REPORT_FROM.trim();
+  const to = (env.BUG_REPORT_TO || "willaugustine64@outlook.com").trim();
+
+  if (!isValidEmailAddress(from) || !isValidEmailAddress(to)) {
+    console.error("Bug report email configuration is invalid", {
+      from: diagnosticEmailValue(from),
+      to: diagnosticEmailValue(to),
+    });
+
+    return jsonResponse({ message: "Bug report email is not configured with valid email addresses." }, 503);
+  }
+
   const emailPayload = {
-    from: env.BUG_REPORT_FROM,
+    from,
     to: [to],
     subject: `Website bug report: ${labelFromBugType(bugType)}`,
     text: [
@@ -105,6 +116,7 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
   const emailResponse = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
+      Accept: "application/json",
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       "Content-Type": "application/json",
     },
@@ -123,6 +135,8 @@ async function handleBugReport(request: Request, env: Env): Promise<Response> {
       payloadKeys: Object.keys(emailPayload),
       resendRequestId: emailResponse.headers.get("x-request-id"),
       resendContentType: emailResponse.headers.get("content-type"),
+      from: diagnosticEmailValue(from),
+      to: diagnosticEmailValue(to),
     });
 
     return jsonResponse({ message: "Bug report email could not be sent. Please try again later." }, 502);
@@ -217,6 +231,18 @@ function sanitizePlainText(value: string): string {
 
 function sanitizeFileName(value: string): string {
   return value.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120) || "bug-report-media";
+}
+
+function isValidEmailAddress(value: string): boolean {
+  return /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(value);
+}
+
+function diagnosticEmailValue(value: string): { value: string; length: number; charCodes: number[] } {
+  return {
+    value,
+    length: value.length,
+    charCodes: Array.from(value).map((character) => character.charCodeAt(0)),
+  };
 }
 
 function bugReportHtml(input: {
