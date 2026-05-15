@@ -13,6 +13,7 @@ import { renderAbout } from "./pages/about";
 import { renderAgileWorkboard } from "./pages/agileWorkboard";
 import { renderExperience } from "./pages/experience";
 import { renderPlaceholder } from "./pages/placeholder";
+import { renderProjects } from "./pages/projects";
 import { renderResume } from "./pages/resume";
 import { renderTechnologies } from "./pages/technologies";
 import type { AppPath } from "./types";
@@ -48,6 +49,8 @@ function route(): void {
     app.innerHTML = renderResume();
   } else if (path === "/experience") {
     app.innerHTML = renderExperience();
+  } else if (path === "/projects") {
+    app.innerHTML = renderProjects();
   } else if (path === "/technologies") {
     app.innerHTML = renderTechnologies();
   } else if (path === "/sprint") {

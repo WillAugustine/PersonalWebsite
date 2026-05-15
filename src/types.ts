@@ -78,3 +78,13 @@ export type ComponentBreakdown = {
   tools: string[];
   notes: string[];
 };
+
+export type ProjectItem = {
+  name: string;
+  course: string;
+  summary: string;
+  url: string;
+  technologies: string[];
+  highlights: string[];
+  status?: string;
+};
