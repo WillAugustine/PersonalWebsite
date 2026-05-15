@@ -18,7 +18,7 @@ export function renderResume(): string {
             <a class="action-button secondary" href="mailto:willaugustine64@outlook.com">Email Me</a>
           </div>
         </div>
-        <fluent-card class="contact-card">
+        <fluent-card class="panel contact-card">
           <h2>Contact</h2>
           <a href="mailto:willaugustine64@outlook.com">willaugustine64@outlook.com</a>
           <a href="tel:+12068501133">(206) 850-1133</a>
@@ -27,38 +27,38 @@ export function renderResume(): string {
         </fluent-card>
       </section>
 
-      <section class="resume-section">
+      <section class="section-block">
         <div class="section-heading">
           <p class="eyebrow">Technical Skills</p>
           <h2>Tools, languages, and practices.</h2>
         </div>
-        <div class="skill-group-grid">
+        <div class="grid grid-3">
           ${skillGroups.map(skillGroupTemplate).join("")}
         </div>
       </section>
 
-      <section class="resume-section">
+      <section class="section-block">
         <div class="section-heading">
           <p class="eyebrow">Experience</p>
           <h2>Recent roles.</h2>
         </div>
-        <div class="resume-timeline">
+        <div class="grid stack">
           ${experienceItems.map(experienceTemplate).join("")}
         </div>
       </section>
 
-      <section class="resume-section">
+      <section class="section-block">
         <div class="section-heading">
           <p class="eyebrow">Education</p>
           <h2>Academic background.</h2>
         </div>
-        <div class="education-grid">
-          <fluent-card class="education-card">
+        <div class="grid grid-3">
+          <fluent-card class="panel education-card">
             <h3>Eastern University</h3>
             <p>Master of Business Administration, Organizational Management with a focus in Project Management</p>
             <span>Expected Jul 2027</span>
           </fluent-card>
-          <fluent-card class="education-card">
+          <fluent-card class="panel education-card">
             <h3>Montana Technological University</h3>
             <p>Bachelor of Science in Computer Science. Minors in Business Administration, Statistics, Mathematics, and Data Science.</p>
             <span>Dec 2023</span>

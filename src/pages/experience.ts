@@ -13,7 +13,7 @@ export function renderExperience(): string {
           My work has centered on Microsoft production experiences, automated testing, service reliability, and making technical work understandable across product, UX, and engineering teams.
         </p>
       </section>
-      <section class="timeline-section">
+      <section class="section-block grid stack">
         ${experienceItems.map(experienceTemplate).join("")}
       </section>
     </main>

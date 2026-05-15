@@ -14,17 +14,17 @@ export function renderTechnologies(): string {
         </p>
       </section>
 
-      <section class="architecture-section">
+      <section class="section-block">
         <div class="section-heading">
           <p class="eyebrow">Architecture</p>
           <h2>Front end, middle tier, and back end.</h2>
         </div>
-        <div class="architecture-grid">
+        <div class="grid grid-3">
           ${technologyTiers.map(technologyTierTemplate).join("")}
         </div>
       </section>
 
-      <section class="component-breakdown-section">
+      <section class="section-block">
         <div class="section-heading">
           <p class="eyebrow">Component Breakdown</p>
           <h2>Features, tools, and implementation notes.</h2>
@@ -32,7 +32,7 @@ export function renderTechnologies(): string {
             This section tracks what powers each major part of the website, including planned components that will eventually introduce API and storage layers.
           </p>
         </div>
-        <div class="component-grid">
+        <div class="grid grid-2">
           ${componentBreakdowns.map(componentBreakdownTemplate).join("")}
         </div>
       </section>
@@ -43,7 +43,7 @@ export function renderTechnologies(): string {
 
 function technologyTierTemplate(tier: TechnologyTier): string {
   return `
-    <fluent-card class="architecture-card">
+    <fluent-card class="panel detail-card">
       <h3>${tier.title}</h3>
       <p>${tier.summary}</p>
       <div class="tech-list compact">
@@ -60,8 +60,8 @@ function componentBreakdownTemplate(component: ComponentBreakdown): string {
   const statusAppearance = component.status === "Live" ? "accent" : "filled";
 
   return `
-    <fluent-card class="component-card">
-      <div class="component-card-heading">
+    <fluent-card class="panel detail-card">
+      <div class="split-heading detail-heading">
         <h3>${component.name}</h3>
         <fluent-badge appearance="${statusAppearance}">${component.status}</fluent-badge>
       </div>

@@ -6,7 +6,7 @@ export function renderProjects(): string {
   return `
     ${navTemplate("/projects")}
     <main class="content-page">
-      <section class="page-intro projects-intro">
+      <section class="page-intro">
         <p class="eyebrow">Projects</p>
         <h1>Code from school, practice, and early engineering work.</h1>
         <p>
@@ -18,12 +18,12 @@ export function renderProjects(): string {
         </div>
       </section>
 
-      <section class="projects-section">
+      <section class="section-block">
         <div class="section-heading">
           <p class="eyebrow">GitHub Repositories</p>
           <h2>Selected public repos.</h2>
         </div>
-        <div class="project-grid">
+        <div class="grid grid-2">
           ${projects.map(projectTemplate).join("")}
         </div>
       </section>
@@ -34,8 +34,8 @@ export function renderProjects(): string {
 
 function projectTemplate(project: ProjectItem): string {
   return `
-    <fluent-card class="project-card">
-      <div class="project-card-heading">
+    <fluent-card class="panel project-card">
+      <div class="split-heading project-heading">
         <div>
           <span>${project.course}</span>
           <h3>${project.name}</h3>

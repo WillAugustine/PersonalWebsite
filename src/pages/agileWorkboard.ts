@@ -15,17 +15,17 @@ export function renderAgileWorkboard(): string {
         </p>
       </section>
 
-      <section class="workboard-section">
+      <section class="section-block">
         <div class="section-heading">
           <p class="eyebrow">User Stories</p>
           <h2>Planned feature work.</h2>
         </div>
-        <div class="story-grid">
+        <div class="grid stack">
           ${userStories.map(userStoryTemplate).join("")}
         </div>
       </section>
 
-      <section class="bug-report-section">
+      <section class="section-block">
         <div class="section-heading">
           <p class="eyebrow">Bugs</p>
           <h2>Report a bug.</h2>
@@ -33,8 +33,8 @@ export function renderAgileWorkboard(): string {
             Share what happened, where it happened, and optional media. Uploads are limited to 3 files, 5 MB each, and 12 MB total.
           </p>
         </div>
-        <fluent-card class="bug-report-card">
-          <form id="bug-report-form" class="bug-report-form" novalidate>
+        <fluent-card class="panel bug-report-card">
+          <form id="bug-report-form" class="grid grid-2 bug-report-form" novalidate>
             <div class="form-field">
               <label for="bug-pages-summary">Which page(s)</label>
               <details class="checkbox-dropdown">
@@ -114,7 +114,7 @@ export function renderAgileWorkboard(): string {
 
 function userStoryTemplate(story: UserStory): string {
   return `
-    <fluent-card class="story-card">
+    <fluent-card class="panel story-card">
       <div class="story-heading">
         <span>${story.id}</span>
         <h3>${story.title}</h3>

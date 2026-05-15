@@ -51,8 +51,8 @@ export function renderAbout(): string {
           <p class="eyebrow">Outside The Code</p>
           <h2>A little more about me.</h2>
         </div>
-        <div class="personal-grid">
-          <article class="personal-story dogs-story">
+        <div class="grid personal-grid">
+          <article class="panel personal-story dogs-story">
             <figure class="personal-photo">
               <img src="/about-milo-otis.jpg" alt="Will Augustine with Amelia and their dogs Milo and Otis" loading="lazy" />
             </figure>
@@ -70,7 +70,7 @@ export function renderAbout(): string {
             </div>
           </article>
 
-          <article class="personal-story movie-story">
+          <article class="panel personal-story movie-story">
             <div class="personal-copy">
               <p class="eyebrow">Movies</p>
               <h3>I love movies and keeping track of what I watch.</h3>
@@ -79,7 +79,7 @@ export function renderAbout(): string {
               </p>
               <a class="action-button secondary" href="https://letterboxd.com/FoodieFrank/" target="_blank" rel="noreferrer">View My Letterboxd Profile</a>
             </div>
-            <div class="movie-poster-grid" aria-label="Favorite movies">
+            <div class="grid movie-poster-grid" aria-label="Favorite movies">
               ${favoriteMovies.map(favoriteMovieTemplate).join("")}
             </div>
           </article>
