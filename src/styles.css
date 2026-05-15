@@ -115,6 +115,14 @@ a {
   inset: 0;
 }
 
+.hero-media {
+  z-index: -2;
+  background:
+    radial-gradient(circle at 74% 22%, rgba(52, 164, 125, 0.16), transparent 30%),
+    radial-gradient(circle at 18% 78%, rgba(31, 107, 82, 0.1), transparent 28%),
+    linear-gradient(120deg, #ffffff 0%, var(--green-050) 48%, #edf7f1 100%);
+}
+
 .hero-overlay {
   z-index: -1;
   background:
