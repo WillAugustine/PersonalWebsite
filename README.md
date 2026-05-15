@@ -21,19 +21,31 @@ npm run build
 
 The production site is emitted to `dist/`.
 
-## Cloudflare Pages
+## Cloudflare Workers Builds
 
-Use these Cloudflare Pages settings:
+Use these settings when connecting the GitHub repository to Cloudflare Workers Builds:
 
 ```txt
 Framework preset: Vite
 Build command: npm run build
-Build output directory: dist
+Deploy command: npx wrangler deploy
+Non-production branch deploy command: npx wrangler versions upload
 Root directory: /
 Node version: 20
 ```
 
-The SPA fallback for short routes such as `/experience`, `/projects`, and `/resume` lives in `public/_redirects`. Vite copies it into `dist/_redirects` during the production build.
+SPA fallback for short routes such as `/experience`, `/projects`, and `/resume` is configured in `wrangler.jsonc`:
+
+```jsonc
+{
+  "assets": {
+    "directory": "./dist/",
+    "not_found_handling": "single-page-application"
+  }
+}
+```
+
+Do not add a Pages-style `_redirects` file when deploying through Workers Builds. Workers static assets handle SPA fallback through `assets.not_found_handling`.
 
 ## Domain
 
