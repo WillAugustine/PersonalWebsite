@@ -30,6 +30,8 @@ const maxChatReplyLength = 1600;
 const maxChatHistory = 10;
 const defaultChatMaxMessages = 6;
 const defaultChatWindowSeconds = 15 * 60;
+const knowledgeGapPrefix = "I do not have enough approved information to answer that.";
+const missingInformationBugType = "missing-information";
 const offTopicExamples = [
   "Try asking, \"What is Will's last name?\"",
   "Try asking, \"What does Will do at Microsoft?\"",
@@ -42,6 +44,7 @@ const allowedFileTypes = new Set(["image/png", "image/jpeg", "image/webp", "vide
 const allowedBugTypes = new Set([
   "broken-link",
   "incorrect-information",
+  missingInformationBugType,
   "layout-visual",
   "mobile-responsive",
   "performance",
@@ -155,9 +158,22 @@ async function handleChat(request: Request, env: Env): Promise<Response> {
     return jsonResponse({ message: userFacingOpenAiError(openAiResponse.status) }, 502);
   }
 
-  const reply = sanitizeChatReply(extractOpenAiText(result));
+  const reply = sanitizeChatReply(extractOpenAiText(result)) || knowledgeGapPrefix;
+  if (isKnowledgeGapReply(reply)) {
+    const wasReported = await sendMissingInformationReport({
+      env,
+      request,
+      question: latestUserMessage.content,
+      botReply: reply,
+    });
+
+    return jsonResponse({
+      reply: missingInformationReply(wasReported),
+    });
+  }
+
   return jsonResponse({
-    reply: reply || "I do not have enough approved information to answer that.",
+    reply,
   });
 }
 
@@ -410,6 +426,18 @@ function offTopicReply(): string {
   return `I am W.I.L.L., a bot for questions about Will Augustine, so I should stick to Will's background, work, projects, skills, and portfolio. ${example}`;
 }
 
+function isKnowledgeGapReply(reply: string): boolean {
+  return reply.toLowerCase().startsWith(knowledgeGapPrefix.toLowerCase());
+}
+
+function missingInformationReply(wasReported: boolean): string {
+  if (wasReported) {
+    return "I do not have enough approved information to answer that yet. I let Will know there is a gap in what I can answer, so he can decide whether to add it.";
+  }
+
+  return "I do not have enough approved information to answer that yet. I tried to flag the gap for Will, but the notification could not be sent automatically.";
+}
+
 function normalizeChatText(value: string): string {
   return sanitizeChatText(value).slice(0, maxChatMessageLength);
 }
@@ -435,7 +463,7 @@ function chatInstructions(): string {
     "Only answer questions about Will Augustine, his background, work, projects, skills, resume, education, location, contact links, interests, family/pets, or this portfolio website.",
     "Do not answer general programming, trivia, homework, news, finance, weather, recipe, translation, or random questions unless they are directly about Will.",
     "If the latest user message is unrelated to Will, gently remind them that they should only ask questions about Will and include one brief example question they could ask.",
-    "Answer only from the approved profile knowledge below. If the answer is not present, say you do not have enough approved information and suggest emailing Will.",
+    `Answer only from the approved profile knowledge below. If the answer is not present, start your reply with exactly "${knowledgeGapPrefix}" and do not guess.`,
     "Use first person only when referring to the bot. Use 'Will' when referring to Will Augustine.",
     "Keep replies concise, warm, and direct. Prefer 2-5 sentences unless the visitor asks for detail.",
     "Do not invent private facts, employment details, availability, opinions, salary information, or personal contact details beyond the approved knowledge.",
@@ -494,6 +522,91 @@ function extractOpenAiText(result: OpenAiResponse): string {
       .join("")
       .trim() ?? ""
   );
+}
+
+async function sendMissingInformationReport(input: {
+  env: Env;
+  request: Request;
+  question: string;
+  botReply: string;
+}): Promise<boolean> {
+  const resendApiKey = normalizeResendApiKey(input.env.RESEND_API_KEY);
+
+  if (!resendApiKey || !input.env.BUG_REPORT_FROM) {
+    console.error("Missing information report email is not configured", {
+      resendConfigured: Boolean(resendApiKey),
+      fromConfigured: Boolean(input.env.BUG_REPORT_FROM),
+    });
+    return false;
+  }
+
+  const from = input.env.BUG_REPORT_FROM.trim();
+  const to = (input.env.BUG_REPORT_TO || "willaugustine64@outlook.com").trim();
+
+  if (!isValidEmailAddress(from) || !isValidEmailAddress(to)) {
+    console.error("Missing information report email configuration is invalid", {
+      from: diagnosticEmailValue(from),
+      to: diagnosticEmailValue(to),
+    });
+    return false;
+  }
+
+  const submittedAt = new Date().toISOString();
+  const userAgent = sanitizePlainText(input.request.headers.get("user-agent") || "Not provided").slice(0, 300);
+  const pageUrl = sanitizePlainText(input.request.url).slice(0, 500);
+  const moreInfo = [
+    "W.I.L.L. could not answer an about-Will question from approved profile knowledge.",
+    "",
+    "Visitor question:",
+    sanitizePlainText(input.question),
+    "",
+    "Bot reply:",
+    sanitizePlainText(input.botReply),
+    "",
+    `Request URL: ${pageUrl}`,
+    `User agent: ${userAgent}`,
+  ].join("\n");
+
+  const emailPayload = {
+    from,
+    to: [to],
+    subject: `Website bug report: ${labelFromBugType(missingInformationBugType)}`,
+    text: [
+      "A new website bug report was submitted.",
+      "",
+      `Submitted: ${submittedAt}`,
+      "Affected pages: Chat",
+      `Bug type: ${labelFromBugType(missingInformationBugType)}`,
+      "Follow up email: Not provided",
+      "",
+      "More information:",
+      moreInfo,
+    ].join("\n"),
+    html: bugReportHtml({
+      submittedAt,
+      pages: ["Chat"],
+      bugType: missingInformationBugType,
+      email: "",
+      moreInfo,
+    }),
+  };
+
+  const resend = new Resend(resendApiKey);
+  const { data, error } = await resend.emails.send(emailPayload);
+
+  if (error) {
+    console.error("Resend missing information report email failed", {
+      error,
+      fromConfigured: Boolean(input.env.BUG_REPORT_FROM),
+      toConfigured: Boolean(to),
+      from: diagnosticEmailValue(from),
+      to: diagnosticEmailValue(to),
+    });
+    return false;
+  }
+
+  console.log("Missing information report email sent", { id: data?.id, to: diagnosticEmailValue(to) });
+  return true;
 }
 
 async function handleBugReport(request: Request, env: Env): Promise<Response> {

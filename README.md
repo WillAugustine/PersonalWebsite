@@ -66,6 +66,8 @@ Then add `BUG_REPORT_FROM` and `BUG_REPORT_TO` in the Cloudflare Worker dashboar
 
 The Chat page posts to `/api/chat`. The Worker labels the assistant as `W.I.L.L.` (`Will-Informed Language Liaison`), keeps the AI API key server-side, limits each response to approved portfolio knowledge, and checks a Workers KV quota before calling OpenAI.
 
+If W.I.L.L. receives an on-topic question but does not have enough approved profile information to answer, it sends a `Missing Information` bug-report email through the same Resend configuration used by `/api/bug-report`, then tells the visitor that Will was made aware of the gap.
+
 Recommended low-cost settings:
 
 ```txt
