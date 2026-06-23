@@ -317,6 +317,10 @@ function isClearlyOffTopic(message: string): boolean {
     return false;
   }
 
+  if (hasAnyWholeTerm(normalized, contextualReferenceTerms) && hasAny(normalized, contextualProfileTerms)) {
+    return false;
+  }
+
   if (hasAny(normalized, offTopicRequestTerms)) {
     return true;
   }
@@ -366,7 +370,36 @@ const allowedWillTopicTerms = [
   "github",
   "linkedin",
   "email",
+  "phone",
   "contact",
+  "hire",
+  "hiring",
+  "opportunity",
+  "opportunities",
+  "open to",
+  "role",
+  "roles",
+  "tpm",
+  "technical program manager",
+  "pm",
+  "product manager",
+  "career",
+  "goals",
+  "salary",
+  "relocation",
+  "relocate",
+  "customer",
+  "customers",
+  "trust",
+  "mindset",
+  "positive",
+  "teammate",
+  "coworker",
+  "work with",
+  "different",
+  "why should",
+  "strengths",
+  "weaknesses",
   "location",
   "live",
   "where are you from",
@@ -389,6 +422,70 @@ const allowedWillTopicTerms = [
   "pets",
   "portfolio",
   "website",
+];
+
+const contextualReferenceTerms = [
+  "he",
+  "him",
+  "his",
+  "they",
+  "them",
+  "their",
+  "theirs",
+  "you",
+  "your",
+  "yours",
+];
+
+const contextualProfileTerms = [
+  "age",
+  "birthday",
+  "born",
+  "color",
+  "favorite",
+  "favourite",
+  "food",
+  "cook",
+  "movie",
+  "book",
+  "music",
+  "hobby",
+  "hobbies",
+  "interest",
+  "interests",
+  "sport",
+  "football",
+  "dog",
+  "dogs",
+  "pet",
+  "pets",
+  "family",
+  "wife",
+  "school",
+  "college",
+  "degree",
+  "work",
+  "job",
+  "role",
+  "career",
+  "skill",
+  "skills",
+  "strength",
+  "strengths",
+  "goal",
+  "goals",
+  "email",
+  "phone",
+  "contact",
+  "linkedin",
+  "github",
+  "live",
+  "from",
+  "located",
+  "open to",
+  "hire",
+  "different",
+  "like",
 ];
 
 const offTopicRequestTerms = [
@@ -419,6 +516,14 @@ const offTopicRequestTerms = [
 
 function hasAny(value: string, terms: string[]): boolean {
   return terms.some((term) => value.includes(term));
+}
+
+function hasAnyWholeTerm(value: string, terms: string[]): boolean {
+  return terms.some((term) => new RegExp(`\\b${escapeRegExp(term)}\\b`).test(value));
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function offTopicReply(): string {
@@ -459,12 +564,13 @@ function chatInstructions(): string {
   return [
     `You are ${chatBotName}, which stands for ${chatBotExpansion}.`,
     "You are an AI bot on Will Augustine's portfolio website. You are not Will Augustine.",
-    "Make the visitor feel like they are talking with a friendly representative of Will, while clearly remaining a bot.",
-    "Only answer questions about Will Augustine, his background, work, projects, skills, resume, education, location, contact links, interests, family/pets, or this portfolio website.",
+    "Make the visitor feel like they are talking with Will through a friendly bot, while clearly remaining a bot if your identity is asked.",
+    "Use first person for normal answers, as if speaking from Will's approved perspective. If asked whether you are Will, explain that you are W.I.L.L., an AI bot using approved information about Will.",
+    "Only answer questions about Will Augustine, his background, work, projects, skills, resume, education, location, contact links, interests, career goals, family/pets, or this portfolio website.",
     "Do not answer general programming, trivia, homework, news, finance, weather, recipe, translation, or random questions unless they are directly about Will.",
+    "Do not answer salary expectation or relocation preference questions. If asked, briefly say you do not cover salary or relocation details and suggest contacting Will directly.",
     "If the latest user message is unrelated to Will, gently remind them that they should only ask questions about Will and include one brief example question they could ask.",
     `Answer only from the approved profile knowledge below. If the answer is not present, start your reply with exactly "${knowledgeGapPrefix}" and do not guess.`,
-    "Use first person only when referring to the bot. Use 'Will' when referring to Will Augustine.",
     "Keep replies concise, warm, and direct. Prefer 2-5 sentences unless the visitor asks for detail.",
     "Do not invent private facts, employment details, availability, opinions, salary information, or personal contact details beyond the approved knowledge.",
     "",
