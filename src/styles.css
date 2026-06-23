@@ -994,7 +994,7 @@ fluent-badge {
   background: #fff7f7;
 }
 
-.chat-message.pending .chat-bubble p {
+.chat-message.pending .chat-message-content {
   color: var(--green-700);
   font-weight: 700;
 }
@@ -1005,12 +1005,45 @@ fluent-badge {
   font-weight: 900;
 }
 
-.chat-bubble p {
+.chat-message-content {
+  display: grid;
+  gap: 8px;
+}
+
+.chat-message-content :is(p, ul, ol) {
   margin-bottom: 0;
   overflow-wrap: anywhere;
   color: var(--ink);
   line-height: 1.55;
+}
+
+.chat-message-content p {
   white-space: pre-wrap;
+}
+
+.chat-message-content :is(ul, ol) {
+  display: grid;
+  gap: 6px;
+  padding-left: 22px;
+}
+
+.chat-message-content :is(strong, em, code, a) {
+  color: var(--green-900);
+}
+
+.chat-message-content code {
+  padding: 1px 5px 2px;
+  border: 1px solid rgba(31, 107, 82, 0.18);
+  border-radius: 5px;
+  background: #ffffff;
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.92em;
+}
+
+.chat-message-content a {
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .chat-composer {
