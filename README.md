@@ -4,7 +4,7 @@ Personal portfolio website for `william-augustine.com`, built with TypeScript, V
 
 ## Run Locally
 
-Install dependencies, then start the Vite dev server.
+Install dependencies, then start the Vite dev server for front-end-only work.
 
 ```powershell
 npm install
@@ -12,6 +12,14 @@ npm run dev
 ```
 
 Open the local URL that Vite prints, usually `http://localhost:5173`.
+
+Routes under `/api/*` are Cloudflare Worker routes, so Vite alone will return `404` for them. To test the chat bot or bug-report API locally, build the static assets and run Wrangler instead:
+
+```powershell
+npm run dev:worker
+```
+
+Wrangler usually serves the Worker at `http://localhost:8787`. Use `http://localhost:8787/chat` when testing W.I.L.L. locally.
 
 ## Build
 
@@ -53,6 +61,53 @@ npx wrangler secret put RESEND_API_KEY
 ```
 
 Then add `BUG_REPORT_FROM` and `BUG_REPORT_TO` in the Cloudflare Worker dashboard under settings for variables/secrets. The sender domain must be verified with Resend.
+
+## W.I.L.L. Chat Bot
+
+The Chat page posts to `/api/chat`. The Worker labels the assistant as `W.I.L.L.` (`Will-Informed Language Liaison`), keeps the AI API key server-side, limits each response to approved portfolio knowledge, and checks a Workers KV quota before calling OpenAI.
+
+Recommended low-cost settings:
+
+```txt
+OPENAI_API_KEY       Secret. Create this in OpenAI and add it as a Cloudflare Worker secret.
+OPENAI_MODEL         Variable. Optional; defaults to gpt-5.4-nano for low-cost portfolio Q&A.
+CHAT_MAX_MESSAGES    Variable. Optional; defaults to 6.
+CHAT_WINDOW_SECONDS  Variable. Optional; defaults to 900.
+CHAT_RATE_LIMIT      KV namespace binding used for per-connection chat caps.
+```
+
+Create the secret:
+
+```powershell
+npx wrangler secret put OPENAI_API_KEY
+```
+
+Create a KV namespace:
+
+```powershell
+npx wrangler kv namespace create CHAT_RATE_LIMIT
+```
+
+Then add the returned namespace ID to `wrangler.jsonc`:
+
+```jsonc
+"kv_namespaces": [
+  {
+    "binding": "CHAT_RATE_LIMIT",
+    "id": "paste-the-production-namespace-id-here"
+  }
+]
+```
+
+The code intentionally refuses to call OpenAI when the KV binding is missing, so a deployment mistake cannot bypass the chat cap.
+
+For local Wrangler testing, create a `.dev.vars` file that is not committed:
+
+```txt
+OPENAI_API_KEY=your-local-openai-key
+```
+
+Do not add real secrets to `wrangler.jsonc` or any committed source file.
 
 SPA fallback for short routes such as `/experience`, `/projects`, and `/resume` is configured in `wrangler.jsonc`:
 

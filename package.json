@@ -10,6 +10,7 @@
   "scripts": {
     "build": "tsc --noEmit && vite build",
     "dev": "vite --host 0.0.0.0",
+    "dev:worker": "npm run build && wrangler dev",
     "preview": "vite preview --host 0.0.0.0",
     "start": "vite --host 0.0.0.0"
   },

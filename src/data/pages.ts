@@ -17,8 +17,8 @@ export const pageSummaries: Record<Exclude<AppPath, "/" | "/experience" | "/resu
     body: "A public workboard for planned portfolio improvements, implementation tasks, and bug reporting.",
   },
   "/chat": {
-    eyebrow: "Chat",
-    title: "Ask About Me",
-    body: "A future chatbot page that answers questions using approved resume, project, and experience content.",
+    eyebrow: "AI Bot",
+    title: "Chat With W.I.L.L.",
+    body: "A portfolio chatbot that answers from approved resume, project, and experience content.",
   },
 };

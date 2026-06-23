@@ -7,10 +7,12 @@ import {
   provideFluentDesignSystem,
 } from "@fluentui/web-components";
 import { bindBugReportForm } from "./bugReportForm";
+import { bindChatBot } from "./chatBot";
 import { navItems } from "./data/navigation";
 import { pageSummaries } from "./data/pages";
 import { renderAbout } from "./pages/about";
 import { renderAgileWorkboard } from "./pages/agileWorkboard";
+import { renderChat } from "./pages/chat";
 import { renderExperience } from "./pages/experience";
 import { renderPlaceholder } from "./pages/placeholder";
 import { renderProjects } from "./pages/projects";
@@ -55,12 +57,15 @@ function route(): void {
     app.innerHTML = renderTechnologies();
   } else if (path === "/sprint") {
     app.innerHTML = renderAgileWorkboard();
+  } else if (path === "/chat") {
+    app.innerHTML = renderChat();
   } else {
     app.innerHTML = renderPlaceholder(path, pageSummaries[path]);
   }
 
   bindRoutes();
   bindBugReportForm();
+  bindChatBot();
 }
 
 function bindRoutes(): void {

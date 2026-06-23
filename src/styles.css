@@ -31,6 +31,15 @@ body {
   background: var(--surface);
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
 :is(a, button, fluent-button) {
   color: inherit;
   font: inherit;
@@ -860,6 +869,198 @@ fluent-badge {
   color: #a4262c;
 }
 
+.chat-page {
+  min-height: calc(100vh - 148px);
+  background: var(--surface-soft);
+}
+
+.chat-hero {
+  display: flex;
+  gap: 18px;
+  align-items: end;
+  justify-content: space-between;
+  padding: clamp(42px, 7vw, 76px) var(--page-x) 24px;
+}
+
+.chat-heading h1 {
+  max-width: 18ch;
+  margin-bottom: 12px;
+}
+
+.chat-heading p:not(.eyebrow) {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.bot-label {
+  display: grid;
+  gap: 4px;
+  min-width: 170px;
+  padding: 14px 16px;
+  border: var(--soft-border);
+  border-radius: var(--radius);
+  background: #ffffff;
+  box-shadow: 0 12px 34px rgba(18, 56, 43, 0.1);
+}
+
+.bot-label span {
+  color: var(--green-900);
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+.bot-label small {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.chat-section {
+  padding-top: 0;
+}
+
+.chat-shell {
+  display: grid;
+  width: min(980px, 100%);
+  min-height: 600px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.chat-thread {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  height: min(62vh, 620px);
+  min-height: 390px;
+  overflow-y: auto;
+  padding: clamp(18px, 3vw, 28px);
+}
+
+.chat-message {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  max-width: min(760px, 100%);
+}
+
+.chat-message.user {
+  grid-template-columns: minmax(0, 1fr) 42px;
+  justify-self: end;
+}
+
+.chat-message.user .chat-avatar {
+  order: 2;
+}
+
+.chat-avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: var(--radius);
+  color: #ffffff;
+  background: var(--green-700);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.chat-message.user .chat-avatar {
+  color: var(--green-900);
+  background: var(--green-100);
+}
+
+.chat-bubble {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--green-050);
+}
+
+.chat-message.user .chat-bubble {
+  background: #ffffff;
+}
+
+.chat-message.error .chat-bubble {
+  border-color: rgba(164, 38, 44, 0.35);
+  background: #fff7f7;
+}
+
+.chat-message.pending .chat-bubble p {
+  color: var(--green-700);
+  font-weight: 700;
+}
+
+.chat-message-label {
+  color: var(--green-900);
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.chat-bubble p {
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.chat-composer {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-top: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.chat-composer textarea {
+  width: 100%;
+  min-height: 88px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid #c8d6ce;
+  border-radius: var(--radius);
+  color: var(--ink);
+  font: inherit;
+}
+
+.chat-composer textarea:focus {
+  outline: var(--focus-ring);
+  border-color: var(--green-600);
+}
+
+.chat-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-status {
+  min-height: 24px;
+  margin-bottom: 0;
+  color: #a4262c;
+  font-weight: 700;
+}
+
+.chat-actions .action-button {
+  min-width: 88px;
+  cursor: pointer;
+}
+
+.chat-actions .action-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 @media (max-width: 900px) {
   .site-header,
   .experience-heading {
@@ -887,6 +1088,38 @@ fluent-badge {
 
   .experience-heading span {
     white-space: normal;
+  }
+}
+
+@media (max-width: 700px) {
+  .chat-hero,
+  .chat-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .bot-label {
+    width: 100%;
+  }
+
+  .chat-section {
+    padding-inline: 12px;
+  }
+
+  .chat-message,
+  .chat-message.user {
+    grid-template-columns: 34px minmax(0, 1fr);
+    justify-self: stretch;
+  }
+
+  .chat-message.user .chat-avatar {
+    order: 0;
+  }
+
+  .chat-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 0.72rem;
   }
 }
 

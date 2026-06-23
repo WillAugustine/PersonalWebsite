@@ -1,12 +1,18 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { Resend } from "resend";
+import { chatBotExpansion, chatBotName, chatKnowledge } from "./data/chatKnowledge";
 
 type Env = {
   ASSETS: Fetcher;
   RESEND_API_KEY?: string;
   BUG_REPORT_FROM?: string;
   BUG_REPORT_TO?: string;
+  OPENAI_API_KEY?: string;
+  OPENAI_MODEL?: string;
+  CHAT_MAX_MESSAGES?: string;
+  CHAT_WINDOW_SECONDS?: string;
+  CHAT_RATE_LIMIT?: KVNamespace;
 };
 
 type ResendAttachment = {
@@ -18,6 +24,10 @@ type ResendAttachment = {
 const maxFiles = 3;
 const maxFileBytes = 5 * 1024 * 1024;
 const maxTotalBytes = 12 * 1024 * 1024;
+const maxChatMessageLength = 800;
+const maxChatHistory = 10;
+const defaultChatMaxMessages = 6;
+const defaultChatWindowSeconds = 15 * 60;
 const allowedFileTypes = new Set(["image/png", "image/jpeg", "image/webp", "video/mp4", "video/webm"]);
 const allowedBugTypes = new Set([
   "broken-link",
@@ -44,9 +54,203 @@ export default {
       return jsonResponse({ message: "Method not allowed." }, 405);
     }
 
+    if (url.pathname === "/api/chat") {
+      if (request.method === "POST") {
+        return handleChat(request, env);
+      }
+
+      return jsonResponse({ message: "Method not allowed." }, 405);
+    }
+
     return env.ASSETS.fetch(request);
   },
 };
+
+async function handleChat(request: Request, env: Env): Promise<Response> {
+  if (!request.headers.get("content-type")?.includes("application/json")) {
+    return jsonResponse({ message: "Chat requests must be JSON." }, 400);
+  }
+
+  if (!env.CHAT_RATE_LIMIT) {
+    return jsonResponse({ message: "Chat rate limiting is not configured yet." }, 503);
+  }
+
+  const rateLimitResult = await checkChatRateLimit(request, env);
+  if (!rateLimitResult.allowed) {
+    return jsonResponse(
+      {
+        message: "W.I.L.L. has reached the chat limit for this connection.",
+        retryAfterSeconds: rateLimitResult.retryAfterSeconds,
+      },
+      429,
+      {
+        "Retry-After": String(rateLimitResult.retryAfterSeconds),
+      },
+    );
+  }
+
+  if (!env.OPENAI_API_KEY) {
+    return jsonResponse({ message: "Chat is not configured yet." }, 503);
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ message: "Chat request JSON could not be parsed." }, 400);
+  }
+
+  const messages = parseChatMessages(body);
+  if (messages.length === 0) {
+    return jsonResponse({ message: "Send a message to W.I.L.L. first." }, 400);
+  }
+
+  const openAiResponse = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: env.OPENAI_MODEL || "gpt-5.4-nano",
+      instructions: chatInstructions(),
+      input: messages,
+      max_output_tokens: 450,
+      text: {
+        verbosity: "low",
+      },
+    }),
+  });
+
+  const result = (await openAiResponse.json()) as OpenAiResponse;
+  if (!openAiResponse.ok) {
+    console.error("OpenAI chat request failed", {
+      status: openAiResponse.status,
+      error: result.error?.message,
+      model: env.OPENAI_MODEL || "gpt-5.4-nano",
+    });
+
+    return jsonResponse({ message: "W.I.L.L. could not answer right now. Please try again later." }, 502);
+  }
+
+  const reply = extractOpenAiText(result).trim();
+  return jsonResponse({
+    reply: reply || "I do not have enough approved information to answer that.",
+  });
+}
+
+type ChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+type OpenAiResponse = {
+  output_text?: string;
+  output?: Array<{
+    type?: string;
+    content?: Array<{
+      type?: string;
+      text?: string;
+    }>;
+  }>;
+  error?: {
+    message?: string;
+  };
+};
+
+function parseChatMessages(body: unknown): ChatMessage[] {
+  if (!body || typeof body !== "object" || !("messages" in body) || !Array.isArray(body.messages)) {
+    return [];
+  }
+
+  return body.messages
+    .slice(-maxChatHistory)
+    .map((message): ChatMessage | null => {
+      if (!message || typeof message !== "object") {
+        return null;
+      }
+
+      const role = "role" in message && message.role === "assistant" ? "assistant" : "user";
+      const content = "content" in message && typeof message.content === "string" ? normalizeChatText(message.content) : "";
+
+      if (!content) {
+        return null;
+      }
+
+      return { role, content };
+    })
+    .filter((message): message is ChatMessage => Boolean(message));
+}
+
+function normalizeChatText(value: string): string {
+  return sanitizePlainText(value).slice(0, maxChatMessageLength);
+}
+
+function chatInstructions(): string {
+  return [
+    `You are ${chatBotName}, which stands for ${chatBotExpansion}.`,
+    "You are an AI bot on Will Augustine's portfolio website. You are not Will Augustine.",
+    "Make the visitor feel like they are talking with a friendly representative of Will, while clearly remaining a bot.",
+    "Answer only from the approved profile knowledge below. If the answer is not present, say you do not have enough approved information and suggest emailing Will.",
+    "Use first person only when referring to the bot. Use 'Will' when referring to Will Augustine.",
+    "Keep replies concise, warm, and direct. Prefer 2-5 sentences unless the visitor asks for detail.",
+    "Do not invent private facts, employment details, availability, opinions, salary information, or personal contact details beyond the approved knowledge.",
+    "",
+    "Approved profile knowledge:",
+    chatKnowledge,
+  ].join("\n");
+}
+
+async function checkChatRateLimit(
+  request: Request,
+  env: Env,
+): Promise<{ allowed: true } | { allowed: false; retryAfterSeconds: number }> {
+  const windowSeconds = positiveInteger(env.CHAT_WINDOW_SECONDS, defaultChatWindowSeconds);
+  const maxMessages = positiveInteger(env.CHAT_MAX_MESSAGES, defaultChatMaxMessages);
+  const windowStartedAt = Math.floor(Date.now() / (windowSeconds * 1000)) * windowSeconds;
+  const key = `chat:${await clientHash(request)}:${windowStartedAt}`;
+  const currentCount = Number((await env.CHAT_RATE_LIMIT?.get(key)) || "0");
+
+  if (currentCount >= maxMessages) {
+    const retryAfterSeconds = Math.max(1, windowStartedAt + windowSeconds - Math.floor(Date.now() / 1000));
+    return { allowed: false, retryAfterSeconds };
+  }
+
+  await env.CHAT_RATE_LIMIT?.put(key, String(currentCount + 1), {
+    expirationTtl: windowSeconds + 60,
+  });
+
+  return { allowed: true };
+}
+
+async function clientHash(request: Request): Promise<string> {
+  const ipAddress =
+    request.headers.get("CF-Connecting-IP") || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ipAddress));
+  return Array.from(new Uint8Array(bytes))
+    .slice(0, 12)
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function positiveInteger(value: string | undefined, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function extractOpenAiText(result: OpenAiResponse): string {
+  if (result.output_text) {
+    return result.output_text;
+  }
+
+  return (
+    result.output
+      ?.flatMap((item) => item.content ?? [])
+      .map((content) => content.text ?? "")
+      .join("")
+      .trim() ?? ""
+  );
+}
 
 async function handleBugReport(request: Request, env: Env): Promise<Response> {
   if (!request.headers.get("content-type")?.includes("multipart/form-data")) {
@@ -296,11 +500,12 @@ function normalizeResendApiKey(value: string | undefined): string {
   return (value || "").trim().replace(/^Bearer\s+/i, "");
 }
 
-function jsonResponse(body: unknown, status = 200): Response {
+function jsonResponse(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
+      ...headers,
     },
   });
 }

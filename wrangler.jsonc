@@ -13,8 +13,17 @@
 			"zone_name": "william-augustine.com"
 		}
 	],
+	"kv_namespaces": [
+		{
+			"binding": "CHAT_RATE_LIMIT",
+			"id": "6a3a144a6add4012b7b3b148ef49c11b"
+		}
+	],
 	"vars": {
 		"BUG_REPORT_FROM": "bug-reports@william-augustine.com",
-		"BUG_REPORT_TO": "willaugustine64@outlook.com"
+		"BUG_REPORT_TO": "willaugustine64@outlook.com",
+		"OPENAI_MODEL": "gpt-5.4-nano",
+		"CHAT_MAX_MESSAGES": "6",
+		"CHAT_WINDOW_SECONDS": "900"
 	}
 }

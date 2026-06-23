@@ -90,12 +90,12 @@ export const componentBreakdowns: ComponentBreakdown[] = [
   },
   {
     name: "Chat Bot",
-    status: "Planned",
+    status: "Live",
     purpose: "Allow visitors to ask questions about Will's background using approved resume, experience, and project content.",
-    tools: ["TypeScript", "Cloudflare Worker API", "OpenAI API or Azure OpenAI", "Profile content store", "Future authentication/abuse controls"],
+    tools: ["TypeScript", "Cloudflare Worker API", "OpenAI Responses API", "Workers KV", "Profile content store"],
     notes: [
-      "The browser should call a Worker endpoint rather than talking directly to an AI provider.",
-      "The Worker can keep API keys private, constrain answers to approved profile data, and log lightweight usage metrics.",
+      "The browser calls a Worker endpoint rather than talking directly to the AI provider.",
+      "The Worker keeps the API key private, constrains answers to approved profile data, and checks a KV-backed per-connection quota before making an AI request.",
     ],
   },
   {
