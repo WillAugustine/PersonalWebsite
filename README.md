@@ -74,6 +74,7 @@ OPENAI_MODEL         Variable. Optional; defaults to gpt-5.4-nano for low-cost p
 CHAT_MAX_MESSAGES    Variable. Optional; defaults to 6.
 CHAT_WINDOW_SECONDS  Variable. Optional; defaults to 900.
 CHAT_RATE_LIMIT      KV namespace binding used for per-connection chat caps.
+CHAT_DEBUG_TOKEN     Secret. Optional; enables the protected `/api/chat-health` diagnostic route.
 ```
 
 Create the secret:
@@ -108,6 +109,17 @@ OPENAI_API_KEY=your-local-openai-key
 ```
 
 Do not add real secrets to `wrangler.jsonc` or any committed source file.
+
+If production returns a generic `502`, use Cloudflare Worker logs first. The Worker logs OpenAI's sanitized status, error code, error type, error message, model, and request ID. For a direct diagnostic check, add a `CHAT_DEBUG_TOKEN` Worker secret, redeploy, and call:
+
+```powershell
+Invoke-WebRequest -Method Post `
+  -Uri https://www.william-augustine.com/api/chat-health `
+  -Headers @{ Authorization = "Bearer your-debug-token" } `
+  -ContentType "application/json"
+```
+
+Remove or rotate `CHAT_DEBUG_TOKEN` after troubleshooting.
 
 SPA fallback for short routes such as `/experience`, `/projects`, and `/resume` is configured in `wrangler.jsonc`:
 

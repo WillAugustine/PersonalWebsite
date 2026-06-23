@@ -12,6 +12,7 @@ type Env = {
   OPENAI_MODEL?: string;
   CHAT_MAX_MESSAGES?: string;
   CHAT_WINDOW_SECONDS?: string;
+  CHAT_DEBUG_TOKEN?: string;
   CHAT_RATE_LIMIT?: KVNamespace;
 };
 
@@ -57,6 +58,14 @@ export default {
     if (url.pathname === "/api/chat") {
       if (request.method === "POST") {
         return handleChat(request, env);
+      }
+
+      return jsonResponse({ message: "Method not allowed." }, 405);
+    }
+
+    if (url.pathname === "/api/chat-health") {
+      if (request.method === "POST") {
+        return handleChatHealth(request, env);
       }
 
       return jsonResponse({ message: "Method not allowed." }, 405);
@@ -116,27 +125,72 @@ async function handleChat(request: Request, env: Env): Promise<Response> {
       instructions: chatInstructions(),
       input: messages,
       max_output_tokens: 450,
-      text: {
-        verbosity: "low",
-      },
     }),
   });
 
   const result = (await openAiResponse.json()) as OpenAiResponse;
   if (!openAiResponse.ok) {
+    const diagnostic = openAiDiagnostic(openAiResponse, result, env);
     console.error("OpenAI chat request failed", {
-      status: openAiResponse.status,
-      error: result.error?.message,
-      model: env.OPENAI_MODEL || "gpt-5.4-nano",
+      ...diagnostic,
+      requestId: openAiResponse.headers.get("x-request-id") || undefined,
     });
 
-    return jsonResponse({ message: "W.I.L.L. could not answer right now. Please try again later." }, 502);
+    return jsonResponse({ message: userFacingOpenAiError(openAiResponse.status) }, 502);
   }
 
   const reply = extractOpenAiText(result).trim();
   return jsonResponse({
     reply: reply || "I do not have enough approved information to answer that.",
   });
+}
+
+async function handleChatHealth(request: Request, env: Env): Promise<Response> {
+  if (!env.CHAT_DEBUG_TOKEN) {
+    return jsonResponse({ message: "Chat health checks are not configured." }, 404);
+  }
+
+  const authorization = request.headers.get("authorization") || "";
+  if (authorization !== `Bearer ${env.CHAT_DEBUG_TOKEN}`) {
+    return jsonResponse({ message: "Not found." }, 404);
+  }
+
+  if (!env.OPENAI_API_KEY) {
+    return jsonResponse({ openAiConfigured: false, message: "OPENAI_API_KEY is missing." }, 503);
+  }
+
+  const openAiResponse = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: env.OPENAI_MODEL || "gpt-5.4-nano",
+      instructions: "Reply with exactly: ok",
+      input: "health check",
+      max_output_tokens: 20,
+    }),
+  });
+
+  const result = (await openAiResponse.json()) as OpenAiResponse;
+  const diagnostic = openAiDiagnostic(openAiResponse, result, env);
+
+  if (!openAiResponse.ok) {
+    console.error("OpenAI chat health check failed", {
+      ...diagnostic,
+      requestId: openAiResponse.headers.get("x-request-id") || undefined,
+    });
+  }
+
+  return jsonResponse(
+    {
+      ok: openAiResponse.ok,
+      ...diagnostic,
+      hasReply: Boolean(extractOpenAiText(result).trim()),
+    },
+    openAiResponse.ok ? 200 : 502,
+  );
 }
 
 type ChatMessage = {
@@ -154,9 +208,47 @@ type OpenAiResponse = {
     }>;
   }>;
   error?: {
+    code?: string;
     message?: string;
+    type?: string;
   };
 };
+
+function openAiDiagnostic(response: Response, result: OpenAiResponse, env: Env): {
+  status: number;
+  model: string;
+  errorCode?: string;
+  errorType?: string;
+  errorMessage?: string;
+} {
+  return {
+    status: response.status,
+    model: env.OPENAI_MODEL || "gpt-5.4-nano",
+    errorCode: result.error?.code,
+    errorType: result.error?.type,
+    errorMessage: result.error?.message,
+  };
+}
+
+function userFacingOpenAiError(status: number): string {
+  if (status === 401 || status === 403) {
+    return "W.I.L.L. is connected, but OpenAI rejected the API key or permissions.";
+  }
+
+  if (status === 404) {
+    return "W.I.L.L. is connected, but the configured OpenAI model is not available to this project.";
+  }
+
+  if (status === 429) {
+    return "W.I.L.L. is connected, but OpenAI rate limits or billing limits are blocking the request.";
+  }
+
+  if (status >= 400 && status < 500) {
+    return "W.I.L.L. is connected, but OpenAI rejected the chat request configuration.";
+  }
+
+  return "W.I.L.L. could not answer right now. Please try again later.";
+}
 
 function parseChatMessages(body: unknown): ChatMessage[] {
   if (!body || typeof body !== "object" || !("messages" in body) || !Array.isArray(body.messages)) {
