@@ -33,12 +33,12 @@ const defaultChatWindowSeconds = 15 * 60;
 const knowledgeGapPrefix = "I do not have enough approved information to answer that.";
 const missingInformationBugType = "missing-information";
 const offTopicExamples = [
-  "Try asking, \"What is Will's last name?\"",
-  "Try asking, \"What does Will do at Microsoft?\"",
-  "Try asking, \"What projects has Will worked on?\"",
-  "Try asking, \"What technologies does Will use?\"",
-  "Try asking, \"Where did Will go to school?\"",
-  "Try asking, \"How can I contact Will?\"",
+  "Try asking me, \"What is your last name?\"",
+  "Try asking me, \"What do you do at Microsoft?\"",
+  "Try asking me, \"What projects have you worked on?\"",
+  "Try asking me, \"What technologies do you use?\"",
+  "Try asking me, \"Where did you go to school?\"",
+  "Try asking me, \"How can I contact you?\"",
 ];
 const allowedFileTypes = new Set(["image/png", "image/jpeg", "image/webp", "video/mp4", "video/webm"]);
 const allowedBugTypes = new Set([
@@ -472,6 +472,18 @@ const contextualProfileTerms = [
   "skills",
   "strength",
   "strengths",
+  "best at",
+  "good at",
+  "known for",
+  "proud",
+  "proud of",
+  "accomplishment",
+  "accomplishments",
+  "achievement",
+  "achievements",
+  "personality",
+  "teammate",
+  "coworker",
   "goal",
   "goals",
   "email",
@@ -528,7 +540,7 @@ function escapeRegExp(value: string): string {
 
 function offTopicReply(): string {
   const example = offTopicExamples[Math.floor(Math.random() * offTopicExamples.length)];
-  return `I am W.I.L.L., a bot for questions about Will Augustine, so I should stick to Will's background, work, projects, skills, and portfolio. ${example}`;
+  return `I am W.I.L.L., Will's portfolio bot, so I should stick to questions about my background, work, projects, skills, and portfolio. ${example}`;
 }
 
 function isKnowledgeGapReply(reply: string): boolean {
@@ -569,7 +581,7 @@ function chatInstructions(): string {
     "Only answer questions about Will Augustine, his background, work, projects, skills, resume, education, location, contact links, interests, career goals, family/pets, or this portfolio website.",
     "Do not answer general programming, trivia, homework, news, finance, weather, recipe, translation, or random questions unless they are directly about Will.",
     "Do not answer salary expectation or relocation preference questions. If asked, briefly say you do not cover salary or relocation details and suggest contacting Will directly.",
-    "If the latest user message is unrelated to Will, gently remind them that they should only ask questions about Will and include one brief example question they could ask.",
+    "If the latest user message is unrelated to Will, gently remind them that they should only ask questions about Will and include one brief first-person example question they could ask, such as 'What do you do at Microsoft?'",
     `Answer only from the approved profile knowledge below. If the answer is not present, start your reply with exactly "${knowledgeGapPrefix}" and do not guess.`,
     "Keep replies concise, warm, and direct. Prefer 2-5 sentences unless the visitor asks for detail.",
     "Do not invent private facts, employment details, availability, opinions, salary information, or personal contact details beyond the approved knowledge.",
