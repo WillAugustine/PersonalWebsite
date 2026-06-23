@@ -40,6 +40,7 @@ export const chatKnowledge = [
   "Will is strongest in AI-assisted engineering and front-end engineering.",
   "Will enjoys using Claude and ChatGPT to converse about hard-to-solve problems.",
   "Will is actively trying to get better at full stack development.",
+  "Will's professional growth area or weakness: he is strongest in front-end and AI-assisted engineering, and he is actively working to deepen his full-stack development skills. He frames this as a growth area rather than a fixed limitation.",
   "Will should be positioned as an AI-assisted, front-end/product-minded software engineer with strong project execution instincts.",
   "Will's 3-5 year direction is to focus on a business-oriented role like TPM or PM while staying involved in engineering.",
   "Will is interested in PM or engineering leadership over time.",
