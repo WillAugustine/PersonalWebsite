@@ -8,9 +8,9 @@ export function renderExperience(): string {
     <main class="content-page">
       <section class="page-intro">
         <p class="eyebrow">Experience</p>
-        <h1>Production web engineering, product ownership, and teaching.</h1>
+        <h1>AI-assisted engineering, production UX, and customer-focused delivery.</h1>
         <p>
-          My work has centered on Microsoft production experiences, automated testing, service reliability, and making technical work understandable across product, UX, and engineering teams.
+          My work centers on Outlook Quarantine front-end ownership, telemetry-informed decisions, automated testing, accessibility, reliability, and translating customer needs into shipped product improvements.
         </p>
       </section>
       <section class="section-block grid stack">

@@ -1,34 +1,56 @@
 import { footerTemplate, navTemplate } from "../components/layout";
-import { bugTypes, userStories } from "../data/agile";
+import { bugTypes } from "../data/help";
 import { navItems } from "../data/navigation";
-import type { AgileTask, UserStory } from "../types";
 
-export function renderAgileWorkboard(): string {
+const faqs = [
+  {
+    question: "What technology was used in this website?",
+    answer: 'The short version: TypeScript, Vite, Fluent UI Web Components, Cloudflare Workers, Workers KV, Resend, and the OpenAI Responses API. The full breakdown lives on the <a href="/technologies" data-route>Tech Used</a> page.',
+  },
+  {
+    question: "How can I learn more about Will?",
+    answer: 'The fastest way is to ask <a href="/chat" data-route>W.I.L.L.</a>, the portfolio bot. You can also read the <a href="/" data-route>About</a>, <a href="/experience" data-route>Experience</a>, and <a href="/resume" data-route>Resume</a> pages.',
+  },
+  {
+    question: "How can I contact Will?",
+    answer: 'Email <a href="mailto:willaugustine64@outlook.com">willaugustine64@outlook.com</a>, call <a href="tel:+12068501133">(206) 850-1133</a>, or connect on <a href="https://www.linkedin.com/in/willaugustine64" target="_blank" rel="noreferrer">LinkedIn</a>.',
+  },
+  {
+    question: "Where can I download Will's resume?",
+    answer: 'Use the download button on the <a href="/resume" data-route>Resume</a> page, or download it directly from <a href="/WillAugustine_Resume.pdf" download>this PDF link</a>.',
+  },
+  {
+    question: "What should I do if W.I.L.L. does not know an answer?",
+    answer: "If the question is about Will and W.I.L.L. does not have approved information yet, the bot automatically lets Will know there is a knowledge gap. You can also submit the details below as a missing-information report.",
+  },
+];
+
+export function renderHelp(): string {
   return `
-    ${navTemplate("/sprint")}
+    ${navTemplate("/help")}
     <main class="content-page">
       <section class="page-intro">
-        <p class="eyebrow">Agile Workboard</p>
-        <h1>User stories, implementation tasks, and bug reporting.</h1>
+        <p class="eyebrow">Help</p>
+        <h1>Contact, FAQs, and bug reporting.</h1>
         <p>
-          This board breaks upcoming work into Agile-friendly slices. Public visitors can see planned work and report bugs; editing the board itself should stay behind a future authenticated admin workflow.
+          Find the right page, contact Will, or report an issue with the portfolio. If something is wrong, unclear, missing, or broken, this is the place to send it.
         </p>
       </section>
 
       <section class="section-block">
         <div class="section-heading">
-          <p class="eyebrow">User Stories</p>
-          <h2>Planned feature work.</h2>
+          <p class="eyebrow">FAQs</p>
+          <h2>Quick answers.</h2>
         </div>
-        <div class="grid stack">
-          ${userStories.map(userStoryTemplate).join("")}
+        <div class="grid grid-2">
+          ${faqs.map(faqTemplate).join("")}
         </div>
       </section>
 
       <section class="section-block">
         <div class="section-heading">
-          <p class="eyebrow">Bugs</p>
-          <h2>Report a bug.</h2>
+          <p class="eyebrow">Report</p>
+          <h2>Report a bug or missing information.</h2>
           <p>
             Share what happened, where it happened, and optional media. Uploads are limited to 3 files, 5 MB each, and 12 MB total.
           </p>
@@ -55,9 +77,9 @@ export function renderAgileWorkboard(): string {
             </div>
 
             <div class="form-field">
-              <label for="bug-type">Type of bug</label>
+              <label for="bug-type">Type of report</label>
               <select id="bug-type" name="bugType" required>
-                <option value="">Select a bug type</option>
+                <option value="">Select a report type</option>
                 ${bugTypes.map((type) => `<option value="${type.value}">${type.label}</option>`).join("")}
               </select>
             </div>
@@ -101,7 +123,7 @@ export function renderAgileWorkboard(): string {
             </div>
 
             <div class="form-actions">
-              <button class="action-button primary" type="submit">Submit Bug Report</button>
+              <button class="action-button primary" type="submit">Submit Report</button>
               <span id="bug-report-status" class="form-status" role="status" aria-live="polite"></span>
             </div>
           </form>
@@ -112,42 +134,12 @@ export function renderAgileWorkboard(): string {
   `;
 }
 
-function userStoryTemplate(story: UserStory): string {
+function faqTemplate(faq: { question: string; answer: string }): string {
   return `
-    <fluent-card class="panel story-card">
-      <div class="story-heading">
-        <span>${story.id}</span>
-        <h3>${story.title}</h3>
-      </div>
-      <p class="story-format">
-        As a <strong>${story.persona}</strong>, I want to <strong>${story.goal}</strong>, so that <strong>${story.benefit}</strong>
-      </p>
-      <div class="story-columns">
-        <div>
-          <h4>Acceptance Criteria</h4>
-          <ul>
-            ${story.acceptanceCriteria.map((criterion) => `<li>${criterion}</li>`).join("")}
-          </ul>
-        </div>
-        <div>
-          <h4>Tasks</h4>
-          <div class="task-list">
-            ${story.tasks.map(taskTemplate).join("")}
-          </div>
-        </div>
-      </div>
+    <fluent-card class="panel faq-card">
+      <h3>${faq.question}</h3>
+      <p>${faq.answer}</p>
     </fluent-card>
   `;
 }
 
-function taskTemplate(task: AgileTask): string {
-  return `
-    <div class="task-item">
-      <div>
-        <span>${task.id}</span>
-        <p>${task.title}</p>
-      </div>
-      <fluent-badge appearance="${task.status === "Done" ? "accent" : "filled"}">${task.status}</fluent-badge>
-    </div>
-  `;
-}

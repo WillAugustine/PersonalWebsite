@@ -1,20 +1,4 @@
-import type { ExperienceItem, SkillGroup, WorkItem } from "../types";
-
-export function workItemTemplate(item: WorkItem): string {
-  const badgeAppearance = item.status === "In progress" ? "accent" : "filled";
-
-  return `
-    <fluent-card class="panel work-card">
-      <div class="split-heading work-card-topline">
-        <span>${item.id}</span>
-        <fluent-badge appearance="${badgeAppearance}">${item.status}</fluent-badge>
-      </div>
-      <h3>${item.title}</h3>
-      <p>${item.description}</p>
-      <span class="estimate">${item.estimate}</span>
-    </fluent-card>
-  `;
-}
+import type { ExperienceItem, SkillGroup } from "../types";
 
 export function skillGroupTemplate(group: SkillGroup): string {
   return `

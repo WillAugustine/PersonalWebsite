@@ -9,16 +9,16 @@ export const pageSummaries: Record<Exclude<AppPath, "/" | "/experience" | "/resu
   "/technologies": {
     eyebrow: "Technologies",
     title: "How This Site Is Built",
-    body: "A transparent build log covering TypeScript, Fluent UI, cloud hosting, CI/CD, data modeling, and future backend choices.",
-  },
-  "/sprint": {
-    eyebrow: "Agile Workboard",
-    title: "User Stories, Tasks, and Bugs",
-    body: "A public workboard for planned portfolio improvements, implementation tasks, and bug reporting.",
+    body: "A transparent build log covering TypeScript, Fluent UI, Cloudflare Workers, Worker API routes, AI integration, rate limiting, and security controls.",
   },
   "/chat": {
     eyebrow: "AI Bot",
     title: "Chat With W.I.L.L.",
     body: "A portfolio chatbot that answers from approved resume, project, and experience content.",
+  },
+  "/help": {
+    eyebrow: "Help",
+    title: "Contact, FAQs, and Reports",
+    body: "A help page for common questions, contact paths, bug reports, and missing-information reports.",
   },
 };

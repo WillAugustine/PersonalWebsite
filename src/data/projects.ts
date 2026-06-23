@@ -2,6 +2,20 @@ import type { ProjectItem } from "../types";
 
 export const projects: ProjectItem[] = [
   {
+    name: "Personal Website",
+    course: "Portfolio Infrastructure",
+    summary:
+      "TypeScript, HTML, CSS, and Fluent UI portfolio site hosted on Cloudflare Workers with a secure Worker API layer for chat and bug reporting.",
+    url: "https://github.com/WillAugustine/PersonalWebsite",
+    technologies: ["TypeScript", "Cloudflare Workers", "Fluent UI", "OpenAI Responses API", "Workers KV"],
+    status: "Live",
+    highlights: [
+      "Built a client-side TypeScript site with reusable typed data sources and route-specific render modules.",
+      "Implemented a W.I.L.L. chatbot that answers from approved profile knowledge with server-side secrets, rate limiting, guardrails, and missing-information notifications.",
+      "Built an interactive bug reporting flow that validates submissions and sends automated email notifications through the Worker.",
+    ],
+  },
+  {
     name: "CSCI232-Labs",
     course: "Data Structures & Algorithms",
     summary:
@@ -36,7 +50,7 @@ export const projects: ProjectItem[] = [
     technologies: ["Git", "GitHub", "Documentation", "Workflow"],
     highlights: [
       "Documented practical GitHub setup and repository workflow.",
-      "Covered common source-control commands used in team development.",
+      "Created a hands-on lab covering forks, cloning, README files, .gitignore files, local changes, pushes, and merges.",
       "Shows early attention to repeatable development process.",
     ],
   },

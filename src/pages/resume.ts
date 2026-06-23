@@ -11,7 +11,7 @@ export function renderResume(): string {
           <p class="eyebrow">Resume</p>
           <h1>Will Augustine</h1>
           <p>
-            Mid-level software engineer with Microsoft experience building and supporting production, customer-facing web applications.
+            AI-focused full stack software engineer with Microsoft production experience owning React and TypeScript UI for Outlook Quarantine within security.microsoft.com.
           </p>
           <div class="resume-actions">
             <a class="action-button primary" href="/WillAugustine_Resume.pdf" download>Download PDF Resume</a>
@@ -56,7 +56,7 @@ export function renderResume(): string {
           <fluent-card class="panel education-card">
             <h3>Eastern University</h3>
             <p>Master of Business Administration, Organizational Management with a focus in Project Management</p>
-            <span>Expected Jul 2027</span>
+            <span>Expected July 2027</span>
           </fluent-card>
           <fluent-card class="panel education-card">
             <h3>Montana Technological University</h3>

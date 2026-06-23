@@ -8,9 +8,9 @@ export function renderTechnologies(): string {
     <main class="content-page">
       <section class="page-intro">
         <p class="eyebrow">Technologies</p>
-        <h1>How this website is built and where it is going.</h1>
+        <h1>How this website is built and operated.</h1>
         <p>
-          This portfolio is intentionally lightweight today: a TypeScript front end deployed through Cloudflare Workers with room to add APIs, storage, authentication, and AI-backed features as the site grows.
+          This portfolio is a TypeScript front end deployed through Cloudflare Workers with Worker API routes for bug reporting, W.I.L.L. chat, rate limiting, secure AI calls, and automated notifications.
         </p>
       </section>
 
@@ -29,7 +29,7 @@ export function renderTechnologies(): string {
           <p class="eyebrow">Component Breakdown</p>
           <h2>Features, tools, and implementation notes.</h2>
           <p>
-            This section tracks what powers each major part of the website, including planned components that will eventually introduce API and storage layers.
+            This section tracks what powers each major part of the website, including the live API routes, static assets, security controls, and AI-backed chatbot.
           </p>
         </div>
         <div class="grid grid-2">

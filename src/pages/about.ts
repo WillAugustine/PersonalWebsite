@@ -13,7 +13,7 @@ export function renderAbout(): string {
     <main class="about-page">
       <section class="about-hero">
         <div class="about-hero-copy">
-          <p class="eyebrow">Microsoft Engineer | Super cool dude</p>
+          <p class="eyebrow">Microsoft Engineer | AI-assisted builder</p>
           <h1>Hi, I am Will Augustine.</h1>
           <p>
             I like building useful web things, solving messy problems, and working with people who care about making software better. When I am not coding, I am probably planning a trip, watching a movie, or hanging out with Milo and Otis.
@@ -23,6 +23,7 @@ export function renderAbout(): string {
             <a class="action-button secondary" href="mailto:willaugustine64@outlook.com">Email Me</a>
             <a class="action-button secondary" href="/projects" data-route>Current Projects</a>
             <a class="action-button secondary" href="/technologies" data-route>How I Made This Website</a>
+            <a class="action-button secondary" href="/help" data-route>Help & Contact</a>
           </div>
         </div>
         <figure class="about-hero-photo">
@@ -75,7 +76,7 @@ export function renderAbout(): string {
               <p class="eyebrow">Movies</p>
               <h3>I love movies and keeping track of what I watch.</h3>
               <p>
-                Movies are one of my favorite ways to unwind and find new stories to think about. I have aLetterboxd account for logging watches, ratings, and giving some first thoughts after finishing a movie.
+                Movies are one of my favorite ways to unwind and find new stories to think about. I have a Letterboxd account for logging watches, ratings, and giving some first thoughts after finishing a movie.
               </p>
               <a class="action-button secondary" href="https://letterboxd.com/FoodieFrank/" target="_blank" rel="noreferrer">View My Letterboxd Profile</a>
             </div>

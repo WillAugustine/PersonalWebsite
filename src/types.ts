@@ -3,8 +3,8 @@ export type AppPath =
   | "/experience"
   | "/projects"
   | "/technologies"
-  | "/sprint"
   | "/chat"
+  | "/help"
   | "/resume";
 
 export type NavItem = {
@@ -16,35 +16,6 @@ export type PageSummary = {
   eyebrow: string;
   title: string;
   body: string;
-};
-
-export type WorkItemStatus = "Ready" | "In progress" | "Backlog";
-
-export type WorkItem = {
-  id: string;
-  status: WorkItemStatus;
-  title: string;
-  description: string;
-  estimate: string;
-};
-
-export type AgileTaskStatus = "To do" | "In progress" | "Done";
-
-export type AgileTask = {
-  id: string;
-  title: string;
-  status: AgileTaskStatus;
-  owner: string;
-};
-
-export type UserStory = {
-  id: string;
-  title: string;
-  persona: string;
-  goal: string;
-  benefit: string;
-  acceptanceCriteria: string[];
-  tasks: AgileTask[];
 };
 
 export type BugType = {

@@ -44,7 +44,7 @@ Node version: 22
 
 ## Bug Report Email
 
-The Agile Workboard includes a bug-report form that posts to `/api/bug-report`. The Worker validates the submission, rejects unsafe text and oversized media, and sends the report through Resend.
+The Help page includes a bug-report form that posts to `/api/bug-report`. The Worker validates the submission, rejects unsafe text and oversized media, and sends the report through Resend.
 
 Configure these Cloudflare Worker values before expecting live emails:
 
@@ -161,10 +161,10 @@ Keep DNS in Squarespace and add the DNS records Cloudflare Pages gives you durin
 - `/experience`
 - `/projects`
 - `/technologies`
-- `/sprint`
 - `/chat`
+- `/help`
 - `/resume`
 
 ## Direction
 
-The sprint board is public and read-only in this first version. The recommended next step is an authenticated admin page backed by an API so work items can be created, edited, reordered, and completed without exposing write access to visitors.
+The site now keeps public support flows on the Help page. Future authenticated admin tools can be added behind protected Worker routes if editable site content or private work tracking becomes useful.

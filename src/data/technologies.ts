@@ -15,24 +15,24 @@ export const technologyTiers: TechnologyTier[] = [
   },
   {
     title: "Middle Tier",
-    summary: "The live site does not yet need an application API, but the deployment path leaves room for Workers-based services.",
-    technologies: ["Cloudflare Workers", "Wrangler", "Static Assets", "SPA fallback routing", "Future API routes"],
+    summary: "Cloudflare Worker routes power bug reporting, W.I.L.L. chat, rate limiting, missing-information notifications, and static asset delivery.",
+    technologies: ["Cloudflare Workers", "Wrangler", "Static Assets", "SPA fallback routing", "Worker API routes", "Workers KV"],
     details: [
       "Wrangler deploys the site as a Cloudflare Worker with static assets served from the Vite `dist` directory.",
       "Worker static asset routing is configured with `not_found_handling: single-page-application` for routes such as `/resume` and `/experience`.",
-      "Future middle-tier routes can live beside the static site for features such as authenticated work-item editing or chatbot requests.",
-      "This tier is the natural place to protect API keys, validate requests, enforce authentication, and avoid exposing privileged logic to browsers.",
+      "The Worker exposes `/api/bug-report`, `/api/chat`, and a protected `/api/chat-health` diagnostic route.",
+      "This tier protects API keys, validates requests, enforces chat rate limits, applies security headers, and avoids exposing privileged logic to browsers.",
     ],
   },
   {
     title: "Back End",
-    summary: "The current back end is intentionally minimal: no database or server-side persistence is required for the first public version.",
-    technologies: ["Cloudflare global network", "GitHub repository", "Workers Builds", "Future storage options"],
+    summary: "The back end stays intentionally small: Worker secrets, KV chat throttling, Resend email, and source-controlled profile data cover the current needs.",
+    technologies: ["Cloudflare global network", "GitHub repository", "Workers Builds", "Workers KV", "Resend", "OpenAI Responses API"],
     details: [
       "Cloudflare serves the production build globally with low operational overhead.",
       "GitHub is the source of truth for the codebase and triggers Cloudflare builds when changes are pushed.",
       "The resume PDF and browser icon are static assets copied into the deployed build.",
-      "When persistent features are added, likely options include Cloudflare D1 for relational data, KV for simple key-value content, or R2 for larger files.",
+      "Workers KV stores short-lived per-connection chat counters, while approved chatbot knowledge remains source-controlled for reviewability.",
     ],
   },
 ];
@@ -41,7 +41,7 @@ export const componentBreakdowns: ComponentBreakdown[] = [
   {
     name: "Landing Page",
     status: "Live",
-    purpose: "Introduce Will Augustine, summarize engineering focus areas, and provide clear paths into resume, projects, sprint planning, and future pages.",
+    purpose: "Introduce Will Augustine, summarize engineering focus areas, and provide clear paths into resume, projects, help, and W.I.L.L. chat.",
     tools: ["TypeScript", "Vite", "Fluent UI Web Components", "CSS", "Client-side routing"],
     notes: [
       "Built as the first page of the portfolio with a clean, image-free visual system.",
@@ -69,13 +69,13 @@ export const componentBreakdowns: ComponentBreakdown[] = [
     ],
   },
   {
-    name: "Sprint Planning Board",
+    name: "Help & Contact",
     status: "Live",
-    purpose: "Expose a public Agile workboard with user stories, acceptance criteria, tasks, and bug reporting.",
-    tools: ["Typed Agile data", "Fluent UI badges", "Static rendering", "Cloudflare Worker API"],
+    purpose: "Give visitors a practical place for FAQs, contact links, bug reporting, and missing-information reports.",
+    tools: ["Typed FAQ data", "Fluent cards", "Cloudflare Worker API", "Resend email API", "Server-side validation"],
     notes: [
-      "The current board is read-only and source-controlled, with the chatbot user story broken into implementation tasks.",
-      "A future admin surface can add login, API validation, and persistent storage.",
+      "The page points visitors to Tech Used, Chat, Resume, and direct contact paths.",
+      "The existing bug-report flow now lives here instead of on a public Agile workboard.",
     ],
   },
   {
@@ -95,7 +95,7 @@ export const componentBreakdowns: ComponentBreakdown[] = [
     tools: ["TypeScript", "Cloudflare Worker API", "OpenAI Responses API", "Workers KV", "Profile content store"],
     notes: [
       "The browser calls a Worker endpoint rather than talking directly to the AI provider.",
-      "The Worker keeps the API key private, constrains answers to approved profile data, and checks a KV-backed per-connection quota before making an AI request.",
+      "The Worker keeps the API key private, constrains answers to approved profile data, formats safe Markdown, checks a KV-backed per-connection quota, and emails Will when approved knowledge is missing.",
     ],
   },
   {
