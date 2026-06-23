@@ -26,9 +26,18 @@ const maxFiles = 3;
 const maxFileBytes = 5 * 1024 * 1024;
 const maxTotalBytes = 12 * 1024 * 1024;
 const maxChatMessageLength = 800;
+const maxChatReplyLength = 1600;
 const maxChatHistory = 10;
 const defaultChatMaxMessages = 6;
 const defaultChatWindowSeconds = 15 * 60;
+const offTopicExamples = [
+  "Try asking, \"What is Will's last name?\"",
+  "Try asking, \"What does Will do at Microsoft?\"",
+  "Try asking, \"What projects has Will worked on?\"",
+  "Try asking, \"What technologies does Will use?\"",
+  "Try asking, \"Where did Will go to school?\"",
+  "Try asking, \"How can I contact Will?\"",
+];
 const allowedFileTypes = new Set(["image/png", "image/jpeg", "image/webp", "video/mp4", "video/webm"]);
 const allowedBugTypes = new Set([
   "broken-link",
@@ -71,13 +80,32 @@ export default {
       return jsonResponse({ message: "Method not allowed." }, 405);
     }
 
-    return env.ASSETS.fetch(request);
+    return withSecurityHeaders(await env.ASSETS.fetch(request));
   },
 };
 
 async function handleChat(request: Request, env: Env): Promise<Response> {
   if (!request.headers.get("content-type")?.includes("application/json")) {
     return jsonResponse({ message: "Chat requests must be JSON." }, 400);
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ message: "Chat request JSON could not be parsed." }, 400);
+  }
+
+  const messages = parseChatMessages(body);
+  if (messages.length === 0) {
+    return jsonResponse({ message: "Send a message to W.I.L.L. first." }, 400);
+  }
+
+  const latestUserMessage = latestUserChatMessage(messages);
+  if (!latestUserMessage || isClearlyOffTopic(latestUserMessage.content)) {
+    return jsonResponse({
+      reply: offTopicReply(),
+    });
   }
 
   if (!env.CHAT_RATE_LIMIT) {
@@ -100,18 +128,6 @@ async function handleChat(request: Request, env: Env): Promise<Response> {
 
   if (!env.OPENAI_API_KEY) {
     return jsonResponse({ message: "Chat is not configured yet." }, 503);
-  }
-
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return jsonResponse({ message: "Chat request JSON could not be parsed." }, 400);
-  }
-
-  const messages = parseChatMessages(body);
-  if (messages.length === 0) {
-    return jsonResponse({ message: "Send a message to W.I.L.L. first." }, 400);
   }
 
   const openAiResponse = await fetch("https://api.openai.com/v1/responses", {
@@ -139,7 +155,7 @@ async function handleChat(request: Request, env: Env): Promise<Response> {
     return jsonResponse({ message: userFacingOpenAiError(openAiResponse.status) }, 502);
   }
 
-  const reply = extractOpenAiText(result).trim();
+  const reply = sanitizeChatReply(extractOpenAiText(result));
   return jsonResponse({
     reply: reply || "I do not have enough approved information to answer that.",
   });
@@ -274,8 +290,141 @@ function parseChatMessages(body: unknown): ChatMessage[] {
     .filter((message): message is ChatMessage => Boolean(message));
 }
 
+function latestUserChatMessage(messages: ChatMessage[]): ChatMessage | null {
+  return [...messages].reverse().find((message) => message.role === "user") ?? null;
+}
+
+function isClearlyOffTopic(message: string): boolean {
+  const normalized = message.toLowerCase().replace(/[^a-z0-9\s.]/g, " ");
+
+  if (hasAny(normalized, allowedWillTopicTerms)) {
+    return false;
+  }
+
+  if (hasAny(normalized, offTopicRequestTerms)) {
+    return true;
+  }
+
+  return true;
+}
+
+const allowedWillTopicTerms = [
+  "will",
+  "william",
+  "augustine",
+  "w.i.l.l",
+  "w i l l",
+  "your name",
+  "first name",
+  "last name",
+  "full name",
+  "who are you",
+  "who is",
+  "about you",
+  "about him",
+  "background",
+  "resume",
+  "cv",
+  "experience",
+  "job",
+  "role",
+  "microsoft",
+  "outlook",
+  "defender",
+  "quarantine",
+  "internship",
+  "teaching assistant",
+  "education",
+  "school",
+  "college",
+  "university",
+  "degree",
+  "mba",
+  "montana tech",
+  "eastern university",
+  "skills",
+  "technologies",
+  "tools",
+  "languages",
+  "projects",
+  "github",
+  "linkedin",
+  "email",
+  "contact",
+  "location",
+  "live",
+  "where are you from",
+  "where did you grow up",
+  "philadelphia",
+  "travel",
+  "hobbies",
+  "interests",
+  "favorite movie",
+  "favorite movies",
+  "movies",
+  "letterboxd",
+  "wife",
+  "married",
+  "family",
+  "amelia",
+  "milo",
+  "otis",
+  "dog",
+  "pets",
+  "portfolio",
+  "website",
+];
+
+const offTopicRequestTerms = [
+  "write code",
+  "write a function",
+  "write me code",
+  "debug",
+  "fix this code",
+  "programming question",
+  "solve this",
+  "math problem",
+  "recipe",
+  "weather",
+  "stock",
+  "sports",
+  "news",
+  "capital of",
+  "translate",
+  "summarize this",
+  "make me",
+  "build an app",
+  "explain javascript",
+  "explain python",
+  "explain c++",
+  "what is react",
+  "what is typescript",
+];
+
+function hasAny(value: string, terms: string[]): boolean {
+  return terms.some((term) => value.includes(term));
+}
+
+function offTopicReply(): string {
+  const example = offTopicExamples[Math.floor(Math.random() * offTopicExamples.length)];
+  return `I am W.I.L.L., a bot for questions about Will Augustine, so I should stick to Will's background, work, projects, skills, and portfolio. ${example}`;
+}
+
 function normalizeChatText(value: string): string {
-  return sanitizePlainText(value).slice(0, maxChatMessageLength);
+  return sanitizeChatText(value).slice(0, maxChatMessageLength);
+}
+
+function sanitizeChatText(value: string): string {
+  return value
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "")
+    .replace(/[<>`]/g, "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .trim();
+}
+
+function sanitizeChatReply(value: string): string {
+  return sanitizeChatText(value).slice(0, maxChatReplyLength).trim();
 }
 
 function chatInstructions(): string {
@@ -283,6 +432,9 @@ function chatInstructions(): string {
     `You are ${chatBotName}, which stands for ${chatBotExpansion}.`,
     "You are an AI bot on Will Augustine's portfolio website. You are not Will Augustine.",
     "Make the visitor feel like they are talking with a friendly representative of Will, while clearly remaining a bot.",
+    "Only answer questions about Will Augustine, his background, work, projects, skills, resume, education, location, contact links, interests, family/pets, or this portfolio website.",
+    "Do not answer general programming, trivia, homework, news, finance, weather, recipe, translation, or random questions unless they are directly about Will.",
+    "If the latest user message is unrelated to Will, gently remind them that they should only ask questions about Will and include one brief example question they could ask.",
     "Answer only from the approved profile knowledge below. If the answer is not present, say you do not have enough approved information and suggest emailing Will.",
     "Use first person only when referring to the bot. Use 'Will' when referring to Will Augustine.",
     "Keep replies concise, warm, and direct. Prefer 2-5 sentences unless the visitor asks for detail.",
@@ -593,11 +745,43 @@ function normalizeResendApiKey(value: string | undefined): string {
 }
 
 function jsonResponse(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      ...headers,
-    },
+  return withSecurityHeaders(
+    new Response(JSON.stringify(body), {
+      status,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "X-Content-Type-Options": "nosniff",
+        ...headers,
+      },
+    }),
+  );
+}
+
+function withSecurityHeaders(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("X-Frame-Options", "DENY");
+  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+  headers.set(
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
+      "script-src 'self'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data:",
+      "font-src 'self' data:",
+      "connect-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "frame-ancestors 'none'",
+      "form-action 'self'",
+    ].join("; "),
+  );
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
   });
 }
