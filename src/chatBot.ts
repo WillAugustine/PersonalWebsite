@@ -1,3 +1,5 @@
+import { chatInputMaxLength } from "./data/chatConfig";
+
 type ChatRole = "user" | "assistant";
 
 type ChatMessage = {
@@ -12,12 +14,21 @@ export function bindChatBot(): void {
   const input = document.querySelector<HTMLTextAreaElement>("#chat-input");
   const thread = document.querySelector<HTMLElement>("#chat-thread");
   const status = document.querySelector<HTMLElement>("#chat-status");
+  const characterCount = document.querySelector<HTMLElement>("#chat-character-count");
 
-  if (!form || !input || !thread || !status) {
+  if (!form || !input || !thread || !status || !characterCount) {
     return;
   }
 
   const messages: ChatMessage[] = [];
+  updateCharacterCount(input, characterCount);
+
+  input.addEventListener("input", () => {
+    updateCharacterCount(input, characterCount);
+    if (input.value.length <= chatInputMaxLength) {
+      status.textContent = "";
+    }
+  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -28,8 +39,15 @@ export function bindChatBot(): void {
       return;
     }
 
+    if (content.length > chatInputMaxLength) {
+      status.textContent = `Keep your message to ${chatInputMaxLength} characters or fewer.`;
+      updateCharacterCount(input, characterCount);
+      return;
+    }
+
     const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
     input.value = "";
+    updateCharacterCount(input, characterCount);
     status.textContent = "";
     submitButton?.setAttribute("disabled", "true");
 
@@ -240,6 +258,12 @@ function markdownTokenToNode(token: string): Node {
 
 function scrollThreadToLatest(thread: HTMLElement): void {
   thread.scrollTo({ top: thread.scrollHeight, behavior: "smooth" });
+}
+
+function updateCharacterCount(input: HTMLTextAreaElement, characterCount: HTMLElement): void {
+  const remaining = chatInputMaxLength - input.value.length;
+  characterCount.textContent = `${input.value.length}/${chatInputMaxLength} characters`;
+  characterCount.classList.toggle("near-limit", remaining <= 80);
 }
 
 function formatWait(seconds: number): string {

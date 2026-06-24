@@ -1,4 +1,5 @@
 import { footerTemplate, navTemplate } from "../components/layout";
+import { chatInputMaxLength } from "../data/chatConfig";
 import { chatBotExpansion, chatBotName } from "../data/chatKnowledge";
 
 export function renderChat(): string {
@@ -31,9 +32,12 @@ export function renderChat(): string {
 
           <form class="chat-composer" id="chat-form">
             <label class="sr-only" for="chat-input">Message ${chatBotName}</label>
-            <textarea id="chat-input" name="message" rows="3" maxlength="800" placeholder="Ask about Will's experience, projects, or skills"></textarea>
+            <textarea id="chat-input" name="message" rows="3" maxlength="${chatInputMaxLength}" placeholder="Ask about Will's experience, projects, or skills" aria-describedby="chat-character-count"></textarea>
             <div class="chat-actions">
-              <p class="chat-status" id="chat-status" role="status"></p>
+              <div class="chat-feedback">
+                <p class="chat-character-count" id="chat-character-count">0/${chatInputMaxLength} characters</p>
+                <p class="chat-status" id="chat-status" role="status"></p>
+              </div>
               <button class="action-button primary" type="submit">Send</button>
             </div>
           </form>
@@ -43,4 +47,3 @@ export function renderChat(): string {
     ${footerTemplate()}
   `;
 }
-

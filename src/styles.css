@@ -917,6 +917,9 @@ fluent-badge {
 }
 
 .chat-section {
+  display: grid;
+  align-items: center;
+  justify-items: center;
   padding-top: 0;
 }
 
@@ -1082,6 +1085,23 @@ fluent-badge {
   margin-bottom: 0;
   color: #a4262c;
   font-weight: 700;
+}
+
+.chat-feedback {
+  display: grid;
+  gap: 4px;
+}
+
+.chat-character-count {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.chat-character-count.near-limit {
+  color: #a4262c;
 }
 
 .chat-actions .action-button {

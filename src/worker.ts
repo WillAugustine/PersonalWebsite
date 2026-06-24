@@ -1,6 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { Resend } from "resend";
+import { chatInputMaxLength } from "./data/chatConfig";
 import { chatBotExpansion, chatBotName, chatKnowledge } from "./data/chatKnowledge";
 
 type Env = {
@@ -25,7 +26,7 @@ type ResendAttachment = {
 const maxFiles = 3;
 const maxFileBytes = 5 * 1024 * 1024;
 const maxTotalBytes = 12 * 1024 * 1024;
-const maxChatMessageLength = 800;
+const maxChatMessageLength = chatInputMaxLength;
 const maxChatReplyLength = 1600;
 const maxChatHistory = 10;
 const defaultChatMaxMessages = 6;
@@ -563,7 +564,7 @@ function escapeRegExp(value: string): string {
 
 function offTopicReply(): string {
   const example = offTopicExamples[Math.floor(Math.random() * offTopicExamples.length)];
-  return `I am W.I.L.L., Will's portfolio bot, so I should stick to questions about my background, work, projects, skills, and portfolio. ${example}`;
+  return `I am W.I.L.L., Will's portfolio bot, so you should stick to questions about my background, work, projects, skills, and portfolio. ${example}`;
 }
 
 function isKnowledgeGapReply(reply: string): boolean {
