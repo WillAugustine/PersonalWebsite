@@ -37,6 +37,16 @@ if (!appRoot) {
 
 const app = appRoot;
 
+const pageTitles: Record<AppPath, string> = {
+  "/": "About | Will Augustine",
+  "/experience": "Experience | Will Augustine",
+  "/projects": "Projects | Will Augustine",
+  "/technologies": "Tech Used | Will Augustine",
+  "/chat": "Chat With W.I.L.L. | Will Augustine",
+  "/help": "Help | Will Augustine",
+  "/resume": "Resume | Will Augustine",
+};
+
 function getCurrentPath(): AppPath {
   const path = window.location.pathname as AppPath;
   return navItems.some((item) => item.path === path) ? path : "/projects";
@@ -44,6 +54,7 @@ function getCurrentPath(): AppPath {
 
 function route(): void {
   const path = getCurrentPath();
+  document.title = pageTitles[path];
 
   if (path === "/") {
     app.innerHTML = renderAbout();

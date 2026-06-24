@@ -60,6 +60,11 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
+    if (url.hostname === "www.william-augustine.com") {
+      url.hostname = "william-augustine.com";
+      return Response.redirect(url.toString(), 308);
+    }
+
     if (url.pathname === "/api/bug-report") {
       if (request.method === "POST") {
         return handleBugReport(request, env);

@@ -9,6 +9,10 @@
 	},
 	"routes": [
 		{
+			"pattern": "william-augustine.com/*",
+			"zone_name": "william-augustine.com"
+		},
+		{
 			"pattern": "*.william-augustine.com/*",
 			"zone_name": "william-augustine.com"
 		}
